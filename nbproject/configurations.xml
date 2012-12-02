@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="80">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>main.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <incDir>
+            <pElem>/usr/local/include/opencv2</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibLibItem>opencv_calib3d</linkerLibLibItem>
+            <linkerLibLibItem>opencv_contrib</linkerLibLibItem>
+            <linkerLibLibItem>opencv_core</linkerLibLibItem>
+            <linkerLibLibItem>opencv_features2d</linkerLibLibItem>
+            <linkerLibLibItem>opencv_flann</linkerLibLibItem>
+            <linkerLibLibItem>opencv_gpu</linkerLibLibItem>
+            <linkerLibLibItem>opencv_highgui</linkerLibLibItem>
+            <linkerLibLibItem>opencv_imgproc</linkerLibLibItem>
+            <linkerLibLibItem>opencv_legacy</linkerLibLibItem>
+            <linkerLibLibItem>opencv_ml</linkerLibLibItem>
+            <linkerLibLibItem>opencv_objdetect</linkerLibLibItem>
+            <linkerLibLibItem>opencv_ts</linkerLibLibItem>
+            <linkerLibLibItem>opencv_video</linkerLibLibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>/usr/local/include/opencv2</pElem>
+          </incDir>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibLibItem>opencv_calib3d</linkerLibLibItem>
+            <linkerLibLibItem>opencv_contrib</linkerLibLibItem>
+            <linkerLibLibItem>opencv_core</linkerLibLibItem>
+            <linkerLibLibItem>opencv_features2d</linkerLibLibItem>
+            <linkerLibLibItem>opencv_flann</linkerLibLibItem>
+            <linkerLibLibItem>opencv_gpu</linkerLibLibItem>
+            <linkerLibLibItem>opencv_highgui</linkerLibLibItem>
+            <linkerLibLibItem>opencv_imgproc</linkerLibLibItem>
+            <linkerLibLibItem>opencv_legacy</linkerLibLibItem>
+            <linkerLibLibItem>opencv_ml</linkerLibLibItem>
+            <linkerLibLibItem>opencv_objdetect</linkerLibLibItem>
+            <linkerLibLibItem>opencv_ts</linkerLibLibItem>
+            <linkerLibLibItem>opencv_video</linkerLibLibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+    </conf>
+  </confs>
+</configurationDescriptor>
