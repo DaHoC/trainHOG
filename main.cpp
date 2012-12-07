@@ -5,22 +5,29 @@
  * @brief:  Example on how to train your custom HOG detecting vector
  * for use with openCV <code>hog.setSVMDetector(_descriptor)</code>;
  * 
+ * 1. Read training sample files from specified directories 
+ * 2. Calculate features and assign them to classes (pos, neg)
+ * 3. Pass the features and their classes to a machine learning algorithm, e.g. SVMlight (@see http://svmlight.joachims.org/)
+ * 
  * Compile by issuing:
- * g++ `pkg-config --cflags --libs opencv` -o openCVHogTrainer main.cpp
+ * g++ -o openCVHogTrainer main.cpp `pkg-config --cflags --libs opencv`
  */
 
 #include <stdio.h>
 #include <dirent.h>
 #include <ios>
+#include <fstream>
 #include <opencv2/opencv.hpp>
-#include <opencv2/ml/ml.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/ml/ml.hpp>
 
 using namespace std;
 using namespace cv;
 
 /* Parameter definitions */
 
+static const String posSamplesDir = "./pos";
+static const String negSamplesDir = "./neg";
 static const Size trainingPadding = Size(32, 32);
 static const Size winStride = Size(8, 8);
 
@@ -32,6 +39,51 @@ static string toLowerCase(const string& in) {
         t += tolower(*i);
     }
     return t;
+}
+
+static void storeCursor(void) {
+    printf("\033[s");
+}
+
+static void resetCursor(void) {
+    printf("\033[u");
+}
+
+/**
+ * Saves the given descriptor vector to a file
+ * @param descriptorVector the descriptor vector to save
+ * @param _vectorIndices contains indices for the corresponding vector values (e.g. descriptorVector(0)=3.5f may have index 1)
+ * @param fileName
+ * @TODO Use _vectorIndices to write correct indices
+ */
+static void saveDescriptorVectorToFile(vector<float>& descriptorVector, vector<unsigned int>& _vectorIndices, string fileName) {
+    printf("Saving descriptor vector to file '%s'\n", fileName.c_str());
+    /// @WARNING: This is really important, ROS seems to set the system locale which takes decimal commata instead of points which causes the file input parsing to fail
+    setlocale(LC_ALL, "C"); // Do not use the system locale
+    string separator = " "; // Use blank as default separator between single features
+    fstream File;
+    float percent;
+    File.open(fileName.c_str(), ios::out);
+    if (File.is_open()) {
+        //        File << "# This file contains the trained descriptor vector" << endl;
+        printf("Saving descriptor vector features:\t");
+//            printf("\n#features %d", descriptorVector->size());
+        storeCursor();
+        for (int feature = 0; feature < descriptorVector.size(); ++feature) {
+            if ((feature % 10 == 0) || (feature == (descriptorVector.size()-1)) ) {
+                percent = ((1 + feature) * 100 / descriptorVector.size());
+                printf("%4u (%3.0f%%)", feature, percent);
+                fflush(stdout);
+                resetCursor();
+            }
+            //                File << _vectorIndices->at(feature) << ":";
+            File << descriptorVector.at(feature) << separator;
+        }
+        printf("\n");
+        File << endl;
+        File.flush();
+        File.close();
+    }
 }
 
 /**
@@ -82,7 +134,9 @@ static void calculateFeaturesFromInput(const string& imageFilename, vector<float
     printf("Reading image file '%s'\n", imageFilename.c_str());
     /** for imread flags from openCV documentation, 
      * @see http://docs.opencv.org/modules/highgui/doc/reading_and_writing_images_and_video.html?highlight=imread#Mat imread(const string& filename, int flags)
-     * @note If you get a compile-time error complaining about following line (esp. imread), you probably do not have a current openCV version (>2.0)!
+     * @note If you get a compile-time error complaining about following line (esp. imread),
+     * you either do not have a current openCV version (>2.0) 
+     * or the linking order is incorrect, try g++ -o openCVHogTrainer main.cpp `pkg-config --cflags --libs opencv`
      */
     Mat imageData = imread(imageFilename, 0);
     if (imageData.empty()) {
@@ -109,16 +163,16 @@ static void calculateFeaturesFromInput(const string& imageFilename, vector<float
  */
 int main(int argc, char** argv) {
 
-    HOGDescriptor hog;
+    HOGDescriptor hog; // Use standard parameters here
     // Get the files to train from somewhere
     vector<string> positiveTrainingImages;
     vector<string> negativeTrainingImages;
     vector<string> validExtensions;
     validExtensions.push_back("jpg");
     validExtensions.push_back("png");
-    getFilesInDirectory("./pos/", positiveTrainingImages, validExtensions);
-    getFilesInDirectory("./neg/", negativeTrainingImages, validExtensions);
-    // Retrieve the descriptor vectors from the samples
+    getFilesInDirectory(posSamplesDir, positiveTrainingImages, validExtensions);
+    getFilesInDirectory(negSamplesDir, negativeTrainingImages, validExtensions);
+    /// Retrieve the descriptor vectors from the samples
     vector<vector<float> > positiveSampleFeatures;
     vector<vector<float> > negativeSampleFeatures;
     // positive samples
@@ -138,11 +192,37 @@ int main(int argc, char** argv) {
         }
     }
 
-//    printf("Generating representative single detecing HOG feature vector using svmlight\n");
-//    vector<float> descriptorVector;
-//    vector<unsigned int> descriptorVectorIndices;
-//    SVMlight::getInstance()->retrieveSingleDetectingVector(descriptorVector, descriptorVectorIndices);
+    /// Train the gathered feature vectors with e.g. SVMlight, @see http://svmlight.joachims.org/
+/*
+//                printf("\nSaving feature vectors of samples to file '%s' for %s training\n", this->featuresFile.c_str(), learner->getSVMName());
+//                trainerHelper::saveFeatureVectorsInSVMLightCompatibleFormat(&trainingSamplesClasses, trainingSamplesClasses, this->featuresFile);
+                printf("Passing feature vectors to %s (Warning: This can take quite some while!)\n", SVMlight::getInstance()->getSVMName());
+                SVMlight::getInstance()->read_problem(const_cast<char*> (this->featuresFile.c_str()));
+                SVMlight::getInstance()->train(); // Call the core libsvm training procedure
+                printf("Training done, saving model file!\n");
+                if (!this->featProt->getSVMModelFile().empty())
+                    SVMlight::getInstance()->saveModelToFile(this->featProt->getSVMModelFile());
+*/
 
+/*
+                printf("Generating representative single HOG feature vector using svmlight!\n");
+                vector<float> descriptorVector;
+                vector<unsigned int> descriptorVectorIndices;
+                SVMlight::getInstance()->retrieveSingleDetectingVector(descriptorVector, descriptorVectorIndices);
+                trainerHelper::saveDescriptorVectorToFile(descriptorVector, descriptorVectorIndices, this->featProt->getDetectorFile());
+                if (!this->featProt->getSVMModelFile().empty()) {
+                    SVMlight::getInstance()->saveModelToFile(this->featProt->getSVMModelFile());
+*/
+
+/*
+            libSVM::getInstance()->freeMem();
+        trainingSamplesFeatures.release();
+        trainingSamplesClasses.release();
+
+        trainingSamplesFeaturesMat.release();
+        classCorrespondences.release();
+        regionCorrespondences.release();
+*/
 
     return EXIT_SUCCESS;
 }

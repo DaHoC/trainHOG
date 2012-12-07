@@ -35,26 +35,11 @@
       </toolsSet>
       <compileType>
         <ccTool>
-          <incDir>
-            <pElem>/usr/local/include/opencv2</pElem>
-          </incDir>
+          <commandLine>`pkg-config --cflags opencv`</commandLine>
+          <useLinkerLibraries>false</useLinkerLibraries>
         </ccTool>
         <linkerTool>
-          <linkerLibItems>
-            <linkerLibLibItem>opencv_calib3d</linkerLibLibItem>
-            <linkerLibLibItem>opencv_contrib</linkerLibLibItem>
-            <linkerLibLibItem>opencv_core</linkerLibLibItem>
-            <linkerLibLibItem>opencv_features2d</linkerLibLibItem>
-            <linkerLibLibItem>opencv_flann</linkerLibLibItem>
-            <linkerLibLibItem>opencv_gpu</linkerLibLibItem>
-            <linkerLibLibItem>opencv_highgui</linkerLibLibItem>
-            <linkerLibLibItem>opencv_imgproc</linkerLibLibItem>
-            <linkerLibLibItem>opencv_legacy</linkerLibLibItem>
-            <linkerLibLibItem>opencv_ml</linkerLibLibItem>
-            <linkerLibLibItem>opencv_objdetect</linkerLibLibItem>
-            <linkerLibLibItem>opencv_ts</linkerLibLibItem>
-            <linkerLibLibItem>opencv_video</linkerLibLibItem>
-          </linkerLibItems>
+          <commandLine>`pkg-config --libs opencv`</commandLine>
         </linkerTool>
       </compileType>
     </conf>
