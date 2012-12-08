@@ -12,7 +12,7 @@ CND_DISTDIR=dist
 CND_BUILDDIR=build
 NBTMPDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tmp-packaging
 TMPDIRNAME=tmp-packaging
-OUTPUT_PATH=${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/opencvhogtrainer
+OUTPUT_PATH=opencvhogtrainer
 OUTPUT_BASENAME=opencvhogtrainer
 PACKAGE_TOP_DIR=opencvhogtrainer/
 

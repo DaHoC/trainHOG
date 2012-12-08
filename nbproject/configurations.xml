@@ -12,6 +12,18 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="f2" displayName="genfiles" projectFiles="true">
+      </logicalFolder>
+      <logicalFolder name="svmlight" displayName="svmlight" projectFiles="true">
+        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/kernel.h</itemPath>
+        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c</itemPath>
+        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.h</itemPath>
+        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c</itemPath>
+        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c</itemPath>
+        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.h</itemPath>
+        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svmlight.h</itemPath>
+      </logicalFolder>
+      <itemPath>Readme.md</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -26,6 +38,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>/home/dahoc/projects/openCVHogTrainer/svmlight</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="1">
@@ -39,7 +54,10 @@
           <useLinkerLibraries>false</useLinkerLibraries>
         </ccTool>
         <linkerTool>
-          <commandLine>`pkg-config --libs opencv`</commandLine>
+          <output>opencvhogtrainer</output>
+          <linkerLibItems>
+            <linkerOptionItem>`pkg-config --libs opencv`</linkerOptionItem>
+          </linkerLibItems>
         </linkerTool>
       </compileType>
     </conf>
