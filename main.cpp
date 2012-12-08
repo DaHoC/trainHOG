@@ -2,11 +2,12 @@
  * @file:   main.cpp
  * @author: Jan Hendriks (dahoc3150 [at] yahoo.com)
  * @date:   Created on 2. Dezember 2012
- * @brief:  Example on how to train your custom HOG detecting vector
+ * @brief:  Example program on how to train your custom HOG detecting vector
  * for use with openCV <code>hog.setSVMDetector(_descriptor)</code>;
  * 
  * For the paper regarding Histograms of Oriented Gradients (HOG), @see http://lear.inrialpes.fr/pubs/2005/DT05/
  * You can populate the positive samples dir with files from the INRIA person detection dataset, @see http://pascal.inrialpes.fr/data/human/
+ * Tested with openCV 2.3.1 and SVMlight 
  * 
  * What this program basically does:
  * 1. Read positive and negative training sample image files from specified directories
@@ -20,6 +21,9 @@
  * gcc -c -g `pkg-config --cflags opencv` -MMD -MP -MF svmlight/svm_hideo.o.d -o svmlight/svm_hideo.o svmlight/svm_hideo.c
  * gcc -c -g `pkg-config --cflags opencv` -MMD -MP -MF svmlight/svm_common.o.d -o svmlight/svm_common.o svmlight/svm_common.c
  * g++ `pkg-config --cflags opencv` -o opencvhogtrainer main.o svmlight/svm_learn.o svmlight/svm_hideo.o svmlight/svm_common.o `pkg-config --libs opencv`
+ * 
+ * Warning:
+ * Be aware that the program may consume a considerable amount of main memory, hard disk memory and time, dependent on the amount of training samples.
  * 
  * Terms of use:
  * This program is to be used as an example and is provided on an "as-is" basis without any warranties of any kind, either express or implied.
@@ -41,6 +45,7 @@
 using namespace std;
 using namespace cv;
 
+// <editor-fold defaultstate="collapsed" desc="Parameter definitions">
 /* Parameter definitions */
 
 // Directory containing positive sample images
@@ -57,7 +62,9 @@ static string descriptorVectorFile = "genfiles/descriptorvector.dat";
 // HOG parameters for training that for some reason are not included in the HOG class
 static const Size trainingPadding = Size(32, 32);
 static const Size winStride = Size(8, 8);
+// </editor-fold>
 
+// <editor-fold defaultstate="collapsed" desc="Helper functions">
 /* Helper functions */
 
 static string toLowerCase(const string& in) {
@@ -134,25 +141,24 @@ static void saveFeatureVectorsInSVMLightCompatibleFormat(const Mat& descr, const
     File.open(saveToFile.c_str(), ios::out);
     if (File.good() && File.is_open()) {
 //        File << "# Use this file to train, e.g. SVMlight by issuing $ svm_learn -i 1 -a weights.txt " << saveToFile.c_str() << endl;
-        int sampleClass = 0;
         printf("Saving %d samples:\t\t", descr.rows);
         storeCursor();
-        for (int sample = 1; sample <= descr.rows; ++sample) {
+        for (unsigned int sample = 1; sample <= descr.rows; ++sample) {
+            Mat currentFeatureVectorRow = descr.row(sample-1);
             if ( sample % 10 == 0 || sample == descr.rows) {
                 percent = (sample * 100 / descr.rows);
                 printf("%5u (%3.0f%%)", sample, percent);
                 fflush(stdout);
                 resetCursor();
             }
-            // Convert positive class to +1. and negative class to -1. for svmlight
-            sampleClass = (((int)classBelonging.at<float>(sample-1, 0) == 1) ? +1 : -1);
-            if (sampleClass == 1) {
+            // Convert positive class to +1 and negative class to -1 for SVMlight
+            if (classBelonging.at<bool>(sample-1, 0)) {
                 File << "+1"; // +1
             } else {
                 File << "-1"; // -1
             }
-            for (int feature = 0; feature < descr.cols; ++feature) {
-                File << " " << (feature + 1) << ":" << descr.at<float>(sample-1, feature);
+            for (int feature = 0; feature < currentFeatureVectorRow.cols; ++feature) {
+                File << " " << (feature + 1) << ":" << currentFeatureVectorRow.at<float>(feature);
             }
             if (sample != descr.rows) {
                 File << endl;
@@ -202,10 +208,11 @@ static void getFilesInDirectory(const string& dirName, vector<string>& fileNames
 }
 
 /**
- * This is the actual calculation from the (input) image data to the HOG descriptor/feature vector using the hog.compute() functio
- * @param imageFilename
- * @param descriptorVector
- * @param hog
+ * This is the actual calculation from the (input) image data to the HOG descriptor/feature vector using the hog.compute() function
+ * @param imageFilename file path of the image file to read and calculate feature vector from
+ * @param descriptorVector the returned calculated feature vector<float> , 
+ *      I can't comprehend why openCV implementation returns std::vector<float> instead of cv::MatExpr_<float> (e.g. Mat<float>)
+ * @param hog HOGDescriptor containin HOG settings
  */
 static void calculateFeaturesFromInput(const string& imageFilename, vector<float>& featureVector, HOGDescriptor& hog) {
 //    printf("Reading image file '%s'\n", imageFilename.c_str());
@@ -231,6 +238,7 @@ static void calculateFeaturesFromInput(const string& imageFilename, vector<float
     hog.compute(imageData, featureVector, winStride, trainingPadding, locations);
 //    imageData.release(); // Release the image again after features are extracted
 }
+// </editor-fold>
 
 /**
  * Main program entry point
@@ -264,8 +272,9 @@ int main(int argc, char** argv) {
     assert(positiveTrainingImages.size() > 0);
     calculateFeaturesFromInput(positiveTrainingImages.front(), tmpFeatureVector, hog);
 
+    // Preparing feature map
     Mat trainingSamplesFeatures = Mat(0, tmpFeatureVector.size(), cv::DataType<float>::type);
-    Mat trainingSamplesClasses = Mat(0, 1, cv::DataType<float>::type);
+    Mat trainingSamplesClasses = Mat(0, 1, cv::DataType<bool>::type); // Saves memory, true=positive, false=negative sample
     
     try {
         trainingSamplesFeatures.reserve(overallSamples);
@@ -275,45 +284,25 @@ int main(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
-    unsigned long currentFile = 0;
     float percent;
-    printf("Reading files:\t");
-    // positive samples
-    for (vector<string>::const_iterator samplesIt = positiveTrainingImages.begin(); samplesIt != positiveTrainingImages.end(); ++samplesIt) {
+    printf("Reading files and generating HOG features:\t");
+    // Iterate over sample images
+    for (unsigned long currentFile = 0; currentFile < overallSamples; ++currentFile) {
         vector<float> featureVector;
         storeCursor();
-        ++currentFile;
         if ( currentFile % 10 == 0 || currentFile == overallSamples) {
             percent = (currentFile * 100 / overallSamples);
             printf("%5lu (%3.0f%%)", currentFile, percent);
             fflush(stdout);
             resetCursor();
         }
-
-        calculateFeaturesFromInput(*samplesIt, featureVector, hog);
+        // Get positive or negative sample file path
+        const string currentImageFile = (currentFile < positiveTrainingImages.size() ? positiveTrainingImages.at(currentFile) : negativeTrainingImages.at(currentFile - positiveTrainingImages.size()));
+        calculateFeaturesFromInput(currentImageFile, featureVector, hog);
         if (!featureVector.empty()) {
             trainingSamplesFeatures.push_back(Mat(Mat(featureVector).t()));
-            trainingSamplesClasses.push_back<float>( 1.);
-
-        }
-    }
-    // negative samples
-    for (vector<string>::const_iterator samplesIt = negativeTrainingImages.begin(); samplesIt != negativeTrainingImages.end(); ++samplesIt) {
-        vector<float> featureVector;
-        
-        storeCursor();
-        ++currentFile;
-        if ( currentFile % 10 == 0 || currentFile == overallSamples) {
-            percent = (currentFile * 100 / overallSamples);
-            printf("%5lu (%3.0f%%)", currentFile, percent);
-            fflush(stdout);
-            resetCursor();
-        }
-
-        calculateFeaturesFromInput(*samplesIt, featureVector, hog);
-        if (!featureVector.empty()) {
-            trainingSamplesFeatures.push_back(Mat(Mat(featureVector).t()));
-            trainingSamplesClasses.push_back<float>(-1.);
+            // Put positive or negative sample class, true=positive
+            trainingSamplesClasses.push_back<bool>((currentFile < positiveTrainingImages.size()));
         }
     }
     printf("\n");
@@ -325,6 +314,9 @@ int main(int argc, char** argv) {
     /** @TODO Avoid detour via file system, inject feature vectors directly into SVMlight */
     printf("\nSaving extracted calculated features of samples with class to file '%s'\n", featuresFile.c_str());
     saveFeatureVectorsInSVMLightCompatibleFormat(trainingSamplesFeatures, trainingSamplesClasses, featuresFile);
+    // Free the memory consumed by the features
+    trainingSamplesFeatures.release();
+    trainingSamplesClasses.release();
 
     /// Read in and train the calculated feature vectors with e.g. SVMlight, @see http://svmlight.joachims.org/
     printf("Passing feature vectors to SVMlight (This can take quite some while!)\n");
@@ -343,8 +335,7 @@ int main(int argc, char** argv) {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Clean up">
-    trainingSamplesFeatures.release();
-    trainingSamplesClasses.release();
+
     // </editor-fold>
 
     return EXIT_SUCCESS;

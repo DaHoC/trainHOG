@@ -1,10 +1,10 @@
-/* 
- * File:   svmlight.h
- * Author: Jan Hendriks
- *
- * Created on 11. Mai 2011, 12:54
- * Wrapper interface for svmlight
- * @see http://www.cs.cornell.edu/people/tj/svm_light/
+/** 
+ * @file:   svmlight.h
+ * @author: Jan Hendriks (dahoc3150 [at] yahoo.com)
+ * @date:   Created on 11. Mai 2011
+ * @brief:  Wrapper interface for SVMlight, 
+ * @see http://www.cs.cornell.edu/people/tj/svm_light/ for SVMlight details and terms of use
+ * 
  */
 
 #ifndef SVMLIGHT_H
@@ -26,11 +26,11 @@ using namespace svmlight;
 class SVMlight {
 private:
     DOC** docs; // training examples
-    long totwords, totdoc, i;
+    long totwords, totdoc, i; // support vector stuff
     double* target;
     double* alpha_in;
     KERNEL_CACHE* kernel_cache;
-    MODEL* model;
+    MODEL* model; // SVM model
 
     SVMlight() {
         // Init variables
@@ -48,7 +48,7 @@ private:
         learn_parm->skip_final_opt_check = 0;
         learn_parm->svm_maxqpsize = 10;
         learn_parm->svm_newvarsinqp = 0;
-        learn_parm->svm_iter_to_shrink = 2; // -9999 // 2 for linear;
+        learn_parm->svm_iter_to_shrink = 2; // 2 is for linear;
         learn_parm->kernel_cache_size = 40;
         learn_parm->maxiter = 100000;
         learn_parm->svm_costratio = 1.0;
@@ -61,14 +61,14 @@ private:
         learn_parm->compute_loo = 0;
         learn_parm->rho = 1.0;
         learn_parm->xa_depth = 0;
-        // The paper uses a soft classifier (C = 0.01), set to 0.0 to get the default calculation
+        // The HOG paper uses a soft classifier (C = 0.01), set to 0.0 to get the default calculation
         learn_parm->svm_c = 0.01; // -c 0.01
-        learn_parm->type = REGRESSION; // old: CLASSIFICATION;
+        learn_parm->type = REGRESSION;
         learn_parm->remove_inconsistent = 0; // -i 0 - Important
         kernel_parm->rbf_gamma = 1.0;
         kernel_parm->coef_lin = 1;
         kernel_parm->coef_const = 1;
-        kernel_parm->kernel_type = LINEAR; // 0 // -t 0
+        kernel_parm->kernel_type = LINEAR; // -t 0
         kernel_parm->poly_degree = 3;
     }
 
@@ -143,7 +143,7 @@ public:
         printf("Last %li\n", model->totwords);
 
         // This is a threshold value which is also recorded in the lear code in lib/windetect.cpp at line 1297 as linearbias and in the original paper as constant epsilon, but no comment on how it is generated
-        singleDetectorVector.at(model->totwords) = -model->b; // Add threshold
+        singleDetectorVector.at(model->totwords) = -model->b; /** @NOTE the minus sign! */
     }
 
 };
