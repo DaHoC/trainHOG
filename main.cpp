@@ -97,16 +97,12 @@ static void resetCursor(void) {
  */
 static void saveDescriptorVectorToFile(vector<float>& descriptorVector, vector<unsigned int>& _vectorIndices, string fileName) {
     printf("Saving descriptor vector to file '%s'\n", fileName.c_str());
-    /// @WARNING: This is really important, ROS seems to set the system locale which takes decimal commata instead of points which causes the file input parsing to fail
-    setlocale(LC_ALL, "C"); // Do not use the system locale
     string separator = " "; // Use blank as default separator between single features
     fstream File;
     float percent;
     File.open(fileName.c_str(), ios::out);
-    if (File.is_open()) {
-        //        File << "# This file contains the trained descriptor vector" << endl;
+    if (File.good() && File.is_open()) {
         printf("Saving descriptor vector features:\t");
-//            printf("\n#features %d", descriptorVector->size());
         storeCursor();
         for (int feature = 0; feature < descriptorVector.size(); ++feature) {
             if ((feature % 10 == 0) || (feature == (descriptorVector.size()-1)) ) {
@@ -115,7 +111,6 @@ static void saveDescriptorVectorToFile(vector<float>& descriptorVector, vector<u
                 fflush(stdout);
                 resetCursor();
             }
-            //                File << _vectorIndices->at(feature) << ":";
             File << descriptorVector.at(feature) << separator;
         }
         printf("\n");
@@ -189,6 +184,43 @@ static void calculateFeaturesFromInput(const string& imageFilename, vector<float
     vector<Point> locations;
     hog.compute(imageData, featureVector, winStride, trainingPadding, locations);
     imageData.release(); // Release the image again after features are extracted
+}
+
+/**
+ * Shows the detections in the image
+ * @param found vector containing valid detection rectangles
+ * @param imageData the image in which the detections are drawn
+ */
+static void showDetections(const vector<Rect>& found, Mat& imageData) {
+    vector<Rect> found_filtered;
+    size_t i, j;
+    for (i = 0; i < found.size(); ++i) {
+        Rect r = found[i];
+        for (j = 0; j < found.size(); ++j)
+            if (j != i && (r & found[j]) == r)
+                break;
+        if (j == found.size())
+            found_filtered.push_back(r);
+    }
+    for (i = 0; i < found_filtered.size(); i++) {
+        Rect r = found_filtered[i];
+        rectangle(imageData, r.tl(), r.br(), Scalar(64, 255, 64), 3);
+    }
+}
+
+/**
+ * Test detection with custom HOG description vector
+ * @param hog
+ * @param imageData
+ */
+static void detectTest(const HOGDescriptor& hog, Mat& imageData) {
+    vector<Rect> found;
+    int groupThreshold = 2;
+    Size padding(Size(32, 32));
+    Size winStride(Size(8, 8));
+    double hitThreshold = 0.; // tolerance
+    hog.detectMultiScale(imageData, found, hitThreshold, winStride, padding, 1.05, groupThreshold);
+    showDetections(found, imageData);
 }
 // </editor-fold>
 
@@ -297,6 +329,23 @@ int main(int argc, char** argv) {
     SVMlight::getInstance()->getSingleDetectingVector(descriptorVector, descriptorVectorIndices);
     // And save the precious to file system
     saveDescriptorVectorToFile(descriptorVector, descriptorVectorIndices, descriptorVectorFile);
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Test detecting vector">
+    printf("Testing custom detection using camera\n");
+    hog.setSVMDetector(descriptorVector); // Set our custom detecting vector
+    VideoCapture cap(0); // open the default camera
+    if(!cap.isOpened()) { // check if we succeeded
+        printf("Error opening camera!\n");
+        return EXIT_FAILURE;
+    }
+    Mat testImage;
+    while ((cvWaitKey(10) & 255) != 27) {
+        cap >> testImage; // get a new frame from camera
+        cvtColor(testImage, testImage, CV_BGR2GRAY);
+        detectTest(hog, testImage);
+        imshow("HOG custom detection", testImage);
+    }
     // </editor-fold>
 
     return EXIT_SUCCESS;
