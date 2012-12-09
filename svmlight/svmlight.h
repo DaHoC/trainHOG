@@ -116,7 +116,7 @@ public:
      * @param singleDetectorVector resulting single detector vector for use in openCV HOG
      * @param singleDetectorVectorIndices
      */
-    void retrieveSingleDetectingVector(std::vector<float>& singleDetectorVector, std::vector<unsigned int>& singleDetectorVectorIndices) {
+    void getSingleDetectingVector(std::vector<float>& singleDetectorVector, std::vector<unsigned int>& singleDetectorVectorIndices) {
         // Now we use the trained svm to retrieve the single detector vector
         DOC** supveclist = model->supvec;
         printf("Calculating single descriptor vector out of support vectors (may take some time)\n");

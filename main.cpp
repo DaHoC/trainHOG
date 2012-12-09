@@ -8,7 +8,8 @@
  * For the paper regarding Histograms of Oriented Gradients (HOG), @see http://lear.inrialpes.fr/pubs/2005/DT05/
  * You can populate the positive samples dir with files from the INRIA person detection dataset, @see http://pascal.inrialpes.fr/data/human/
  * This program uses SVMlight as machine learning algorithm (@see http://svmlight.joachims.org/), but is not restricted to it
- * Tested with openCV 2.3.1 and SVMlight 6.02
+ * Tested in Ubuntu Linux 64bit 12.04 "Precise Pangolin" with openCV 2.3.1, SVMlight 6.02, g++ 4.6.3
+ * and standard HOG settings, training images of size 64x128px.
  * 
  * What this program basically does:
  * 1. Read positive and negative training sample image files from specified directories
@@ -234,9 +235,9 @@ int main(int argc, char** argv) {
     /**
      * Save the calculated descriptor vectors to a file in a format that can be used by SVMlight for training
      * @NOTE: If you split these steps into separate steps: 
-     * 1. calculating features into memory (e.g. into a cv::Mat), 
-     * 2. saving features to file / directly inject to machine learning algorithm,
-     * the program may consume really a lot of main memory
+     * 1. calculating features into memory (e.g. into a cv::Mat or vector< vector<float> >), 
+     * 2. saving features to file / directly inject from memory to machine learning algorithm,
+     * the program may consume a considerable amount of main memory
      */ 
     fstream File;
     File.open(featuresFile.c_str(), ios::out);
@@ -244,11 +245,12 @@ int main(int argc, char** argv) {
         File << "# Use this file to train, e.g. SVMlight by issuing $ svm_learn -i 1 -a weights.txt " << featuresFile.c_str() << endl; // Remove this line for libsvm which does not support comments
         // Iterate over sample images
         for (unsigned long currentFile = 0; currentFile < overallSamples; ++currentFile) {
-            vector<float> featureVector;
             storeCursor();
+            vector<float> featureVector;
             // Get positive or negative sample image file path
             const string currentImageFile = (currentFile < positiveTrainingImages.size() ? positiveTrainingImages.at(currentFile) : negativeTrainingImages.at(currentFile - positiveTrainingImages.size()));
-            if ( (currentFile+1) % 10 == 0 || (currentFile+1) == overallSamples) {
+            // Output progress
+            if ( (currentFile+1) % 10 == 0 || (currentFile+1) == overallSamples ) {
                 percent = ((currentFile+1) * 100 / overallSamples);
                 printf("%5lu (%3.0f%%):\tFile '%s'", (currentFile+1), percent, currentImageFile.c_str());
                 fflush(stdout);
@@ -262,6 +264,7 @@ int main(int argc, char** argv) {
                  * and convert positive class to +1 and negative class to -1 for SVMlight
                  */
                 File << ((currentFile < positiveTrainingImages.size()) ? "+1" : "-1");
+                // Save feature vector components
                 for (unsigned int feature = 0; feature < featureVector.size(); ++feature) {
                     File << " " << (feature + 1) << ":" << featureVector.at(feature);
                 }
@@ -273,6 +276,7 @@ int main(int argc, char** argv) {
         File.close();
     } else {
         printf("Error opening file '%s'!\n", featuresFile.c_str());
+        return EXIT_FAILURE;
     }
     // </editor-fold>
 
@@ -289,12 +293,10 @@ int main(int argc, char** argv) {
     printf("Generating representative single HOG feature vector using svmlight!\n");
     vector<float> descriptorVector;
     vector<unsigned int> descriptorVectorIndices;
-    SVMlight::getInstance()->retrieveSingleDetectingVector(descriptorVector, descriptorVectorIndices);
+    // Generate a single detecting feature vector (v1 | b) from the trained support vectors, for use e.g. with the HOG algorithm
+    SVMlight::getInstance()->getSingleDetectingVector(descriptorVector, descriptorVectorIndices);
+    // And save the precious to file system
     saveDescriptorVectorToFile(descriptorVector, descriptorVectorIndices, descriptorVectorFile);
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="Clean up">
-
     // </editor-fold>
 
     return EXIT_SUCCESS;
