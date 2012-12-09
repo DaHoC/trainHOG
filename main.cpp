@@ -124,54 +124,6 @@ static void saveDescriptorVectorToFile(vector<float>& descriptorVector, vector<u
 }
 
 /**
- * Saves the calculated descriptor vectors to a file in a format that can be used by SVMlight for training
- * @param descr feature-vectors of training samples
- * @param classBelonging teacher, desired output
- * @param saveToFile filename to save to
- */
-static void saveFeatureVectorsInSVMLightCompatibleFormat(const Mat& descr, const Mat& classBelonging, const string& saveToFile) {
-    if (descr.rows != classBelonging.rows) {
-        printf("Error: Dimensions of training samples (%u) do not match classes vector (%u)!\n", descr.rows, classBelonging.rows);
-        exit(EXIT_FAILURE);
-    }
-    /// @WARNING: This is really important, some libraries (e.g. ROS) seems to set the system locale which takes decimal commata instead of points which causes the file input parsing to fail
-    setlocale(LC_ALL, "C"); // Do not use the system locale
-    setlocale(LC_NUMERIC,"C");
-    setlocale(LC_ALL, "POSIX");
-
-    float percent;
-    fstream File;
-    File.open(saveToFile.c_str(), ios::out);
-    if (File.good() && File.is_open()) {
-//        File << "# Use this file to train, e.g. SVMlight by issuing $ svm_learn -i 1 -a weights.txt " << saveToFile.c_str() << endl;
-        printf("Saving %d samples:\t\t", descr.rows);
-        storeCursor();
-        for (unsigned int sample = 1; sample <= descr.rows; ++sample) {
-            Mat currentFeatureVectorRow = descr.row(sample-1);
-            if ( sample % 10 == 0 || sample == descr.rows) {
-                percent = (sample * 100 / descr.rows);
-                printf("%5u (%3.0f%%)", sample, percent);
-                fflush(stdout);
-                resetCursor();
-            }
-            // Convert positive class to +1 and negative class to -1 for SVMlight
-            File << (classBelonging.at<bool>(sample-1, 0) ? "+1" : "-1");
-            for (int feature = 0; feature < currentFeatureVectorRow.cols; ++feature) {
-                File << " " << (feature + 1) << ":" << currentFeatureVectorRow.at<float>(feature);
-            }
-            if (sample != descr.rows) {
-                File << endl;
-            }
-        }
-        printf("\n");
-        File.flush();
-        File.close();
-    } else {
-        printf("Error opening file '%s'!\n", saveToFile.c_str());
-    }
-}
-
-/**
  * For unixoid systems only: Lists all files in a given directory and returns a vector of path+name in string format
  * @param dirName
  * @param fileNames found file names in specified directory
@@ -274,55 +226,61 @@ int main(int argc, char** argv) {
     vector<float> tmpFeatureVector;
     calculateFeaturesFromInput(positiveTrainingImages.front(), tmpFeatureVector, hog);
 
-    // Preparing feature map
-    Mat trainingSamplesFeatures = Mat(0, tmpFeatureVector.size(), cv::DataType<float>::type);
-    Mat trainingSamplesClasses = Mat(0, 1, cv::DataType<bool>::type); // Saves memory, true=positive, false=negative sample
-    
-    try {
-        trainingSamplesFeatures.reserve(overallSamples);
-        trainingSamplesClasses.reserve(overallSamples);
-    } catch (length_error& le) { // If there are too many training samples for our poor PC
-        printf ("Length error, reserving space for Mat of size %lu failed: %s\n", overallSamples, le.what());
-        exit(EXIT_FAILURE);
-    }
+    /// @WARNING: This is really important, some libraries (e.g. ROS) seems to set the system locale which takes decimal commata instead of points which causes the file input parsing to fail
+    setlocale(LC_ALL, "C"); // Do not use the system locale
+    setlocale(LC_NUMERIC,"C");
+    setlocale(LC_ALL, "POSIX");
 
+    printf("Reading files, generating HOG features and save them to file '%s':\t", featuresFile.c_str());
     float percent;
-//    printf("Reading files, generating HOG features and save them:\t");
-    printf("Reading files and generating HOG features:\t");
-    // Iterate over sample images
-    for (unsigned long currentFile = 0; currentFile < overallSamples; ++currentFile) {
-        vector<float> featureVector;
-        storeCursor();
-        if ( currentFile % 10 == 0 || currentFile == overallSamples) {
-            percent = (currentFile * 100 / overallSamples);
-            printf("%5lu (%3.0f%%)", currentFile, percent);
-            fflush(stdout);
-            resetCursor();
+    /**
+     * Save the calculated descriptor vectors to a file in a format that can be used by SVMlight for training
+     * @NOTE: If you split these steps into separate steps: 
+     * 1. calculating features into memory (e.g. into a cv::Mat), 
+     * 2. saving features to file / directly inject to machine learning algorithm,
+     * the program may consume really a lot of main memory
+     */ 
+    fstream File;
+    File.open(featuresFile.c_str(), ios::out);
+    if (File.good() && File.is_open()) {
+
+        // Iterate over sample images
+        for (unsigned long currentFile = 0; currentFile < overallSamples; ++currentFile) {
+            vector<float> featureVector;
+            storeCursor();
+            // Get positive or negative sample file path
+            const string currentImageFile = (currentFile < positiveTrainingImages.size() ? positiveTrainingImages.at(currentFile) : negativeTrainingImages.at(currentFile - positiveTrainingImages.size()));
+            if ( currentFile % 10 == 0 || currentFile == overallSamples) {
+                percent = (currentFile * 100 / overallSamples);
+                printf("%5lu (%3.0f%%): %s", currentFile, percent, currentImageFile.c_str());
+                fflush(stdout);
+                resetCursor();
+            }
+            // Calculate feature vector from current image file
+            calculateFeaturesFromInput(currentImageFile, featureVector, hog);
+            if (!featureVector.empty()) {
+                /* Put positive or negative sample class to file, 
+                 * true=positive, false=negative, 
+                 * and convert positive class to +1 and negative class to -1 for SVMlight
+                 */
+                File << ((currentFile < positiveTrainingImages.size()) ? "+1" : "-1");
+                for (unsigned int feature = 0; feature < featureVector.size(); ++feature) {
+                    File << " " << (feature + 1) << ":" << featureVector.at(feature);
+                }
+                File << endl;
+            }
         }
-        // Get positive or negative sample file path
-        const string currentImageFile = (currentFile < positiveTrainingImages.size() ? positiveTrainingImages.at(currentFile) : negativeTrainingImages.at(currentFile - positiveTrainingImages.size()));
-        calculateFeaturesFromInput(currentImageFile, featureVector, hog);
-        if (!featureVector.empty()) {
-            trainingSamplesFeatures.push_back(Mat(Mat(featureVector).t()));
-            // Put positive or negative sample class, true=positive
-            trainingSamplesClasses.push_back<bool>((currentFile < positiveTrainingImages.size()));
-        }
+        printf("\n");
+        File.flush();
+        File.close();
+    } else {
+        printf("Error opening file '%s'!\n", featuresFile.c_str());
     }
-    printf("\n");
-    // Make sure there are as many training samples as there are class correspondences
-    assert(trainingSamplesClasses.rows == trainingSamplesFeatures.rows);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Pass features to machine learning algorithm">
-    /** @TODO Avoid detour via file system, inject feature vectors directly into SVMlight */
-    printf("\nSaving extracted calculated features of samples with class to file '%s'\n", featuresFile.c_str());
-    saveFeatureVectorsInSVMLightCompatibleFormat(trainingSamplesFeatures, trainingSamplesClasses, featuresFile);
-    // Free the memory consumed by the features
-    trainingSamplesFeatures.release();
-    trainingSamplesClasses.release();
-
-    /// Read in and train the calculated feature vectors with e.g. SVMlight, @see http://svmlight.joachims.org/
-    printf("Passing feature vectors to SVMlight (This can take quite some while!)\n");
+    /// Read in and train the calculated feature vectors
+    printf("Reading feature vectors to SVMlight (This can take quite some while!)\n");
     SVMlight::getInstance()->read_problem(const_cast<char*> (featuresFile.c_str()));
     SVMlight::getInstance()->train(); // Call the core libsvm training procedure
     printf("Training done, saving model file!\n");
