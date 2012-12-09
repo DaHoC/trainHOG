@@ -248,9 +248,9 @@ int main(int argc, char** argv) {
             storeCursor();
             // Get positive or negative sample image file path
             const string currentImageFile = (currentFile < positiveTrainingImages.size() ? positiveTrainingImages.at(currentFile) : negativeTrainingImages.at(currentFile - positiveTrainingImages.size()));
-            if ( currentFile % 10 == 0 || currentFile == overallSamples) {
-                percent = (currentFile * 100 / overallSamples);
-                printf("%5lu (%3.0f%%):\tFile '%s'", currentFile, percent, currentImageFile.c_str());
+            if ( (currentFile+1) % 10 == 0 || (currentFile+1) == overallSamples) {
+                percent = ((currentFile+1) * 100 / overallSamples);
+                printf("%5lu (%3.0f%%):\tFile '%s'", (currentFile+1), percent, currentImageFile.c_str());
                 fflush(stdout);
                 resetCursor();
             }
@@ -278,7 +278,7 @@ int main(int argc, char** argv) {
 
     // <editor-fold defaultstate="collapsed" desc="Pass features to machine learning algorithm">
     /// Read in and train the calculated feature vectors
-    printf("Reading feature vectors to SVMlight (This can take quite some while!)\n");
+    printf("Calling SVMlight\n");
     SVMlight::getInstance()->read_problem(const_cast<char*> (featuresFile.c_str()));
     SVMlight::getInstance()->train(); // Call the core libsvm training procedure
     printf("Training done, saving model file!\n");

@@ -123,24 +123,20 @@ public:
         // Retrieve single detecting vector (v1 | b) from returned ones by calculating vec1 = sum_1_n (alpha_y*x_i). (vec1 is a n x1 column vector. n = feature vector length )
         singleDetectorVector.clear();
         singleDetectorVector.resize(model->totwords + 1, 0.);
-        printf("Vector size %lu\n", singleDetectorVector.size());
+        printf("Resulting vector size %lu\n", singleDetectorVector.size());
+        
         // Walk over every support vector
-        for (unsigned long ssv = 0; ssv < model->sv_num; ++ssv) {
-            printf("SV %lu\n", ssv);
+        for (long ssv = 1; ssv < model->sv_num; ++ssv) { // Don't know what's inside model->supvec[0] ?!
             // Get a single support vector
             DOC* singleSupportVector = supveclist[ssv]; // Get next support vector
             SVECTOR* singleSupportVectorValues = singleSupportVector->fvec;
-            printf("a\n");
             WORD singleSupportVectorComponent;
-            printf("b\n");
             // Walk through components of the support vector and populate our detector vector
             for (unsigned long singleFeature = 0; singleFeature < model->totwords; ++singleFeature) {
-                printf("c %lu", singleFeature);
                 singleSupportVectorComponent = singleSupportVectorValues->words[singleFeature];
                 singleDetectorVector.at(singleSupportVectorComponent.wnum) += (singleSupportVectorComponent.weight * model->alpha[ssv]);
             }
         }
-        printf("Last %li\n", model->totwords);
 
         // This is a threshold value which is also recorded in the lear code in lib/windetect.cpp at line 1297 as linearbias and in the original paper as constant epsilon, but no comment on how it is generated
         singleDetectorVector.at(model->totwords) = -model->b; /** @NOTE the minus sign! */
