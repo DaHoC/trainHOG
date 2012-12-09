@@ -342,7 +342,7 @@ int main(int argc, char** argv) {
     Mat testImage;
     while ((cvWaitKey(10) & 255) != 27) {
         cap >> testImage; // get a new frame from camera
-        cvtColor(testImage, testImage, CV_BGR2GRAY);
+//        cvtColor(testImage, testImage, CV_BGR2GRAY); // If you want to work on grayscale images
         detectTest(hog, testImage);
         imshow("HOG custom detection", testImage);
     }
