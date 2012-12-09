@@ -7,13 +7,16 @@
  * 
  * For the paper regarding Histograms of Oriented Gradients (HOG), @see http://lear.inrialpes.fr/pubs/2005/DT05/
  * You can populate the positive samples dir with files from the INRIA person detection dataset, @see http://pascal.inrialpes.fr/data/human/
- * Tested with openCV 2.3.1 and SVMlight 
+ * This program uses SVMlight as machine learning algorithm (@see http://svmlight.joachims.org/), but is not restricted to it
+ * Tested with openCV 2.3.1 and SVMlight 6.02
  * 
  * What this program basically does:
  * 1. Read positive and negative training sample image files from specified directories
  * 2. Calculate their HOG features and keep track of their classes (pos, neg)
- * 3. Pass the features and their classes to a machine learning algorithm, e.g. SVMlight (@see http://svmlight.joachims.org/)
- * 4. Use the calculated support vectors and SVM model to calculate a single detecting descriptor vector
+ * 3. Save the feature map (vector of vectors/matrix) to file system
+ * 4. Read in and pass the features and their classes to a machine learning algorithm, e.g. SVMlight
+ * 5. Train the machine learning algorithm using the specified parameters
+ * 6. Use the calculated support vectors and SVM model to calculate a single detecting descriptor vector
  * 
  * Build by issuing:
  * g++ `pkg-config --cflags opencv` -c -g -MMD -MP -MF main.o.d -o main.o main.cpp
@@ -28,7 +31,7 @@
  * Terms of use:
  * This program is to be used as an example and is provided on an "as-is" basis without any warranties of any kind, either express or implied.
  * Use at your own risk.
- * For used third-party software, refer to their respective terms of use and licensing
+ * For used third-party software, refer to their respective terms of use and licensing.
  */
 
 #include <stdio.h>
@@ -152,11 +155,7 @@ static void saveFeatureVectorsInSVMLightCompatibleFormat(const Mat& descr, const
                 resetCursor();
             }
             // Convert positive class to +1 and negative class to -1 for SVMlight
-            if (classBelonging.at<bool>(sample-1, 0)) {
-                File << "+1"; // +1
-            } else {
-                File << "-1"; // -1
-            }
+            File << (classBelonging.at<bool>(sample-1, 0) ? "+1" : "-1");
             for (int feature = 0; feature < currentFeatureVectorRow.cols; ++feature) {
                 File << " " << (feature + 1) << ":" << currentFeatureVectorRow.at<float>(feature);
             }
@@ -268,8 +267,11 @@ int main(int argc, char** argv) {
     
     // <editor-fold defaultstate="collapsed" desc="Calculate HOG features">
     // Calculating one single HOG feature vector to determine the length of the vector
+    if (positiveTrainingImages.empty()) {
+        printf("No positive training files found, nothing to do!\n");
+        return EXIT_SUCCESS;
+    }
     vector<float> tmpFeatureVector;
-    assert(positiveTrainingImages.size() > 0);
     calculateFeaturesFromInput(positiveTrainingImages.front(), tmpFeatureVector, hog);
 
     // Preparing feature map
@@ -285,6 +287,7 @@ int main(int argc, char** argv) {
     }
 
     float percent;
+//    printf("Reading files, generating HOG features and save them:\t");
     printf("Reading files and generating HOG features:\t");
     // Iterate over sample images
     for (unsigned long currentFile = 0; currentFile < overallSamples; ++currentFile) {
@@ -340,4 +343,3 @@ int main(int argc, char** argv) {
 
     return EXIT_SUCCESS;
 }
-
