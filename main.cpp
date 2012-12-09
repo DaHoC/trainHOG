@@ -27,6 +27,7 @@
  * 
  * Warning:
  * Be aware that the program may consume a considerable amount of main memory, hard disk memory and time, dependent on the amount of training samples.
+ * Also be aware that (esp. for 32bit systems), there are limitations for the maximum file size which may take effect when writing the features file.
  * 
  * Terms of use:
  * This program is to be used as an example and is provided on an "as-is" basis without any warranties of any kind, either express or implied.
@@ -63,7 +64,7 @@ static string svmModelFile = "genfiles/svmlightmodel.dat";
 static string descriptorVectorFile = "genfiles/descriptorvector.dat";
 
 // HOG parameters for training that for some reason are not included in the HOG class
-static const Size trainingPadding = Size(32, 32);
+static const Size trainingPadding = Size(0, 0);
 static const Size winStride = Size(8, 8);
 // </editor-fold>
 
@@ -166,14 +167,13 @@ static void getFilesInDirectory(const string& dirName, vector<string>& fileNames
  * @param hog HOGDescriptor containin HOG settings
  */
 static void calculateFeaturesFromInput(const string& imageFilename, vector<float>& featureVector, HOGDescriptor& hog) {
-//    printf("Reading image file '%s'\n", imageFilename.c_str());
     /** for imread flags from openCV documentation, 
      * @see http://docs.opencv.org/modules/highgui/doc/reading_and_writing_images_and_video.html?highlight=imread#Mat imread(const string& filename, int flags)
      * @note If you get a compile-time error complaining about following line (esp. imread),
      * you either do not have a current openCV version (>2.0) 
      * or the linking order is incorrect, try g++ -o openCVHogTrainer main.cpp `pkg-config --cflags --libs opencv`
      */
-    Mat imageData(imread(imageFilename, 0));
+    Mat imageData = imread(imageFilename, 0);
     if (imageData.empty()) {
         featureVector.clear();
         printf("Error: HOG image '%s' is empty, features calculation skipped!\n", imageFilename.c_str());
@@ -187,7 +187,7 @@ static void calculateFeaturesFromInput(const string& imageFilename, vector<float
     }
     vector<Point> locations;
     hog.compute(imageData, featureVector, winStride, trainingPadding, locations);
-//    imageData.release(); // Release the image again after features are extracted
+    imageData.release(); // Release the image again after features are extracted
 }
 // </editor-fold>
 
@@ -217,21 +217,19 @@ int main(int argc, char** argv) {
     unsigned long overallSamples = positiveTrainingImages.size() + negativeTrainingImages.size();
     // </editor-fold>
     
-    // <editor-fold defaultstate="collapsed" desc="Calculate HOG features">
-    // Calculating one single HOG feature vector to determine the length of the vector
-    if (positiveTrainingImages.empty()) {
-        printf("No positive training files found, nothing to do!\n");
+    // <editor-fold defaultstate="collapsed" desc="Calculate HOG features and save to file">
+    // Make sure there are actually samples to train
+    if (overallSamples == 0) {
+        printf("No training sample files found, nothing to do!\n");
         return EXIT_SUCCESS;
     }
-    vector<float> tmpFeatureVector;
-    calculateFeaturesFromInput(positiveTrainingImages.front(), tmpFeatureVector, hog);
 
     /// @WARNING: This is really important, some libraries (e.g. ROS) seems to set the system locale which takes decimal commata instead of points which causes the file input parsing to fail
     setlocale(LC_ALL, "C"); // Do not use the system locale
     setlocale(LC_NUMERIC,"C");
     setlocale(LC_ALL, "POSIX");
 
-    printf("Reading files, generating HOG features and save them to file '%s':\t", featuresFile.c_str());
+    printf("Reading files, generating HOG features and save them to file '%s':\n", featuresFile.c_str());
     float percent;
     /**
      * Save the calculated descriptor vectors to a file in a format that can be used by SVMlight for training
@@ -243,16 +241,16 @@ int main(int argc, char** argv) {
     fstream File;
     File.open(featuresFile.c_str(), ios::out);
     if (File.good() && File.is_open()) {
-
+        File << "# Use this file to train, e.g. SVMlight by issuing $ svm_learn -i 1 -a weights.txt " << featuresFile.c_str() << endl; // Remove this line for libsvm which does not support comments
         // Iterate over sample images
         for (unsigned long currentFile = 0; currentFile < overallSamples; ++currentFile) {
             vector<float> featureVector;
             storeCursor();
-            // Get positive or negative sample file path
+            // Get positive or negative sample image file path
             const string currentImageFile = (currentFile < positiveTrainingImages.size() ? positiveTrainingImages.at(currentFile) : negativeTrainingImages.at(currentFile - positiveTrainingImages.size()));
             if ( currentFile % 10 == 0 || currentFile == overallSamples) {
                 percent = (currentFile * 100 / overallSamples);
-                printf("%5lu (%3.0f%%): %s", currentFile, percent, currentImageFile.c_str());
+                printf("%5lu (%3.0f%%):\tFile '%s'", currentFile, percent, currentImageFile.c_str());
                 fflush(stdout);
                 resetCursor();
             }
