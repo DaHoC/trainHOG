@@ -1,6 +1,6 @@
 # openCV HOG Trainer
 
-Example program on how to train your custom HOG detecting vector for use with openCV hog.setSVMDetector(_descriptor)
+Example linux program on how to train your custom HOG detecting vector for use with openCV hog.setSVMDetector(_descriptor)
 
 ## Information
 
@@ -30,6 +30,7 @@ Build by issuing:
     g++ `pkg-config --cflags opencv` -o trainhog main.o svmlight/svm_learn.o svmlight/svm_hideo.o svmlight/svm_common.o `pkg-config --libs opencv`
 
 ## Warning words
+* At least one of the functions (opendir) doing file system operations is unix/linux-only, for using the program in other operating systems a alternative API functions have to be used.
 * Be aware that the program may consume a considerable amount of main memory, hard disk memory and time, dependent on the amount of training samples.
 * Also be aware that (esp. for 32bit systems), there are limitations for the maximum file size which may take effect when writing the features file.
 
