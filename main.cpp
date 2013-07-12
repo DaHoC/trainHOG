@@ -234,6 +234,7 @@ int main(int argc, char** argv) {
 
     // <editor-fold defaultstate="collapsed" desc="Init">
     HOGDescriptor hog; // Use standard parameters here
+    hog.winSize = Size(64, 128); // Default training images size as used in paper
     // Get the files to train from somewhere
     static vector<string> positiveTrainingImages;
     static vector<string> negativeTrainingImages;
@@ -274,7 +275,8 @@ int main(int argc, char** argv) {
     fstream File;
     File.open(featuresFile.c_str(), ios::out);
     if (File.good() && File.is_open()) {
-        File << "# Use this file to train, e.g. SVMlight by issuing $ svm_learn -i 1 -a weights.txt " << featuresFile.c_str() << endl; // Remove this line for libsvm which does not support comments
+		// Remove following line for libsvm which does not support comments
+        // File << "# Use this file to train, e.g. SVMlight by issuing $ svm_learn -i 1 -a weights.txt " << featuresFile.c_str() << endl;
         // Iterate over sample images
         for (unsigned long currentFile = 0; currentFile < overallSamples; ++currentFile) {
             storeCursor();
