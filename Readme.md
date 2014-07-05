@@ -35,7 +35,7 @@ Build by issuing:
 * Also be aware that (esp. for 32bit systems), there are limitations for the maximum file size which may take effect when writing the features file.
 
 ## Contact
-Jan Hendriks (dahoc3150 [at] yahoo.com)
+Jan Hendriks (dahoc3150 [at] gmail.com)
 
 ## Terms of use
 
