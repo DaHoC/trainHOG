@@ -1,6 +1,6 @@
 /**
  * @file:   main.cpp
- * @author: Jan Hendriks (dahoc3150 [at] yahoo.com)
+ * @author: Jan Hendriks (dahoc3150 [at] gmail.com)
  * @date:   Created on 2. Dezember 2012
  * @brief:  Example program on how to train your custom HOG detecting vector
  * for use with openCV <code>hog.setSVMDetector(_descriptor)</code>;
