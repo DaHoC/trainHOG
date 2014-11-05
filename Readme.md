@@ -4,11 +4,10 @@ Example linux program on how to train your custom HOG detecting vector for use w
 
 ## Information
 
-For the paper regarding Histograms of Oriented Gradients (HOG), see http://lear.inrialpes.fr/pubs/2005/DT05/
-You can populate the positive samples dir with files from the INRIA person detection dataset, see http://pascal.inrialpes.fr/data/human/
-This program uses SVMlight as machine learning algorithm (see http://svmlight.joachims.org/), but is not restricted to it
-Tested in Ubuntu Linux 64bit 12.04 "Precise Pangolin" with openCV 2.3.1, SVMlight 6.02, g++ 4.6.3
-and standard HOG settings, training images of size 64x128px.
+For the paper regarding Histograms of Oriented Gradients (HOG), see http://lear.inrialpes.fr/pubs/2005/DT05/.
+You can populate the positive samples dir with files from the INRIA person detection dataset, see http://pascal.inrialpes.fr/data/human/.
+This program uses SVMlight as machine learning algorithm (see http://svmlight.joachims.org/), but is not restricted to it.
+Tested in Ubuntu Linux 64bit 12.04 "Precise Pangolin" with openCV 2.3.1, SVMlight 6.02, g++ 4.6.3 and standard HOG settings, training images of size 64x128px.
 
 What this program basically does:
 * Read positive and negative training sample image files from specified directories
