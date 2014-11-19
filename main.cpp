@@ -1,6 +1,6 @@
 /**
  * @file:   main.cpp
- * @author: Jan Hendriks (dahoc3150 [at] yahoo.com)
+ * @author: Jan Hendriks (dahoc3150 [at] gmail.com)
  * @date:   Created on 2. Dezember 2012
  * @brief:  Example program on how to train your custom HOG detecting vector
  * for use with openCV <code>hog.setSVMDetector(_descriptor)</code>;
@@ -24,7 +24,7 @@
  * gcc -c -g `pkg-config --cflags opencv` -MMD -MP -MF svmlight/svm_learn.o.d -o svmlight/svm_learn.o svmlight/svm_learn.c
  * gcc -c -g `pkg-config --cflags opencv` -MMD -MP -MF svmlight/svm_hideo.o.d -o svmlight/svm_hideo.o svmlight/svm_hideo.c
  * gcc -c -g `pkg-config --cflags opencv` -MMD -MP -MF svmlight/svm_common.o.d -o svmlight/svm_common.o svmlight/svm_common.c
- * g++ `pkg-config --cflags opencv` -o opencvhogtrainer main.o svmlight/svm_learn.o svmlight/svm_hideo.o svmlight/svm_common.o `pkg-config --libs opencv`
+ * g++ `pkg-config --cflags opencv` -o trainhog main.o svmlight/svm_learn.o svmlight/svm_hideo.o svmlight/svm_common.o `pkg-config --libs opencv`
  * 
  * Warning:
  * Be aware that the program may consume a considerable amount of main memory, hard disk memory and time, dependent on the amount of training samples.
@@ -36,6 +36,9 @@
  * For used third-party software, refer to their respective terms of use and licensing.
  */
 
+#define TRAINHOG_USEDSVM SVMLIGHT
+
+
 #include <stdio.h>
 #include <dirent.h>
 #include <ios>
@@ -45,7 +48,13 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
 
-#include "svmlight/svmlight.h"
+#if TRAINHOG_USEDSVM == SVMLIGHT
+    #include "svmlight/svmlight.h"
+    #define TRAINHOG_SVM_TO_TRAIN SVMlight
+#else
+    #include "libsvm/libsvm.h"
+    #define TRAINHOG_SVM_TO_TRAIN libSVM
+#endif
 
 using namespace std;
 using namespace cv;
@@ -97,16 +106,12 @@ static void resetCursor(void) {
  */
 static void saveDescriptorVectorToFile(vector<float>& descriptorVector, vector<unsigned int>& _vectorIndices, string fileName) {
     printf("Saving descriptor vector to file '%s'\n", fileName.c_str());
-    /// @WARNING: This is really important, ROS seems to set the system locale which takes decimal commata instead of points which causes the file input parsing to fail
-    setlocale(LC_ALL, "C"); // Do not use the system locale
     string separator = " "; // Use blank as default separator between single features
     fstream File;
     float percent;
     File.open(fileName.c_str(), ios::out);
-    if (File.is_open()) {
-        //        File << "# This file contains the trained descriptor vector" << endl;
-        printf("Saving descriptor vector features:\t");
-//            printf("\n#features %d", descriptorVector->size());
+    if (File.good() && File.is_open()) {
+        printf("Saving %lu descriptor vector features:\t", descriptorVector.size());
         storeCursor();
         for (int feature = 0; feature < descriptorVector.size(); ++feature) {
             if ((feature % 10 == 0) || (feature == (descriptorVector.size()-1)) ) {
@@ -115,7 +120,6 @@ static void saveDescriptorVectorToFile(vector<float>& descriptorVector, vector<u
                 fflush(stdout);
                 resetCursor();
             }
-            //                File << _vectorIndices->at(feature) << ":";
             File << descriptorVector.at(feature) << separator;
         }
         printf("\n");
@@ -130,7 +134,6 @@ static void saveDescriptorVectorToFile(vector<float>& descriptorVector, vector<u
  * @param dirName
  * @param fileNames found file names in specified directory
  * @param validExtensions containing the valid file extensions for collection in lower case
- * @return 
  */
 static void getFilesInDirectory(const string& dirName, vector<string>& fileNames, const vector<string>& validExtensions) {
     printf("Opening directory %s\n", dirName.c_str());
@@ -190,6 +193,94 @@ static void calculateFeaturesFromInput(const string& imageFilename, vector<float
     hog.compute(imageData, featureVector, winStride, trainingPadding, locations);
     imageData.release(); // Release the image again after features are extracted
 }
+
+/**
+ * Shows the detections in the image
+ * @param found vector containing valid detection rectangles
+ * @param imageData the image in which the detections are drawn
+ */
+static void showDetections(const vector<Point>& found, Mat& imageData) {
+    size_t i, j;
+    for (i = 0; i < found.size(); ++i) {
+        Point r = found[i];
+        // Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height);
+        rectangle(imageData, Rect(r.x-16, r.y-32, 32, 64), Scalar(64, 255, 64), 3);
+    }
+}
+
+/**
+ * Shows the detections in the image
+ * @param found vector containing valid detection rectangles
+ * @param imageData the image in which the detections are drawn
+ */
+static void showDetections(const vector<Rect>& found, Mat& imageData) {
+    vector<Rect> found_filtered;
+    size_t i, j;
+    for (i = 0; i < found.size(); ++i) {
+        Rect r = found[i];
+        for (j = 0; j < found.size(); ++j)
+            if (j != i && (r & found[j]) == r)
+                break;
+        if (j == found.size())
+            found_filtered.push_back(r);
+    }
+    for (i = 0; i < found_filtered.size(); i++) {
+        Rect r = found_filtered[i];
+        rectangle(imageData, r.tl(), r.br(), Scalar(64, 255, 64), 3);
+    }
+}
+
+/**
+ * Test the trained detector against the same training set to get an approximate idea of the detector.
+ * Warning: This does not allow any statement about detection quality, as the detector might be overfitting.
+ * Detector quality must be determined using an independent test set.
+ * @param hog
+ */
+static void detectTrainingSetTest(const HOGDescriptor& hog, const double hitThreshold, const vector<string>& posFileNames, const vector<string>& negFileNames) {
+    unsigned int truePositives = 0;
+    unsigned int trueNegatives = 0;
+    unsigned int falsePositives = 0;
+    unsigned int falseNegatives = 0;
+    vector<Point> foundDetection;
+    // Walk over positive training samples, generate images and detect
+    for (vector<string>::const_iterator posTrainingIterator = posFileNames.begin(); posTrainingIterator != posFileNames.end(); ++posTrainingIterator) {
+        const Mat imageData = imread(*posTrainingIterator, 0);
+        hog.detect(imageData, foundDetection, hitThreshold, winStride, trainingPadding);
+//        printf("Detections in pos training image '%s': %lu\n", posTrainingIterator->c_str(), foundDetection.size());
+        if (foundDetection.size() > 0) {
+            ++truePositives;
+        } else {
+            ++falseNegatives;
+        }
+    }
+    // Walk over negative training samples, generate images and detect
+    for (vector<string>::const_iterator negTrainingIterator = negFileNames.begin(); negTrainingIterator != negFileNames.end(); ++negTrainingIterator) {
+        const Mat imageData = imread(*negTrainingIterator, 0);
+        hog.detect(imageData, foundDetection, hitThreshold, winStride, trainingPadding);
+//        printf("Detections in neg training image '%s': %lu\n", negTrainingIterator->c_str(), foundDetection.size());
+        if (foundDetection.size() > 0) {
+            ++falsePositives;
+        } else {
+            ++trueNegatives;
+        }        
+    }
+    
+    printf("Results:\n\tTrue Positives: %u\n\tTrue Negatives: %u\n\tFalse Positives: %u\n\tFalse Negatives: %u\n", truePositives, trueNegatives, falsePositives, falseNegatives);
+}
+
+/**
+ * Test detection with custom HOG description vector
+ * @param hog
+ * @param hitThreshold threshold value for detection
+ * @param imageData
+ */
+static void detectTest(const HOGDescriptor& hog, const double hitThreshold, Mat& imageData) {
+    vector<Rect> found;
+    Size padding(Size(32, 32));
+    Size winStride(Size(8, 8));
+    hog.detectMultiScale(imageData, found, hitThreshold, winStride, padding);
+    showDetections(found, imageData);
+}
 // </editor-fold>
 
 /**
@@ -202,6 +293,7 @@ int main(int argc, char** argv) {
 
     // <editor-fold defaultstate="collapsed" desc="Init">
     HOGDescriptor hog; // Use standard parameters here
+    hog.winSize = Size(64, 128); // Default training images size as used in paper
     // Get the files to train from somewhere
     static vector<string> positiveTrainingImages;
     static vector<string> negativeTrainingImages;
@@ -242,7 +334,8 @@ int main(int argc, char** argv) {
     fstream File;
     File.open(featuresFile.c_str(), ios::out);
     if (File.good() && File.is_open()) {
-        File << "# Use this file to train, e.g. SVMlight by issuing $ svm_learn -i 1 -a weights.txt " << featuresFile.c_str() << endl; // Remove this line for libsvm which does not support comments
+		// Remove following line for libsvm which does not support comments
+        // File << "# Use this file to train, e.g. SVMlight by issuing $ svm_learn -i 1 -a weights.txt " << featuresFile.c_str() << endl;
         // Iterate over sample images
         for (unsigned long currentFile = 0; currentFile < overallSamples; ++currentFile) {
             storeCursor();
@@ -282,11 +375,11 @@ int main(int argc, char** argv) {
 
     // <editor-fold defaultstate="collapsed" desc="Pass features to machine learning algorithm">
     /// Read in and train the calculated feature vectors
-    printf("Calling SVMlight\n");
-    SVMlight::getInstance()->read_problem(const_cast<char*> (featuresFile.c_str()));
-    SVMlight::getInstance()->train(); // Call the core libsvm training procedure
+    printf("Calling %s\n", TRAINHOG_SVM_TO_TRAIN::getInstance()->getSVMName());
+    TRAINHOG_SVM_TO_TRAIN::getInstance()->read_problem(const_cast<char*> (featuresFile.c_str()));
+    TRAINHOG_SVM_TO_TRAIN::getInstance()->train(); // Call the core libsvm training procedure
     printf("Training done, saving model file!\n");
-    SVMlight::getInstance()->saveModelToFile(svmModelFile);
+    TRAINHOG_SVM_TO_TRAIN::getInstance()->saveModelToFile(svmModelFile);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Generate single detecting feature vector from calculated SVM support vectors and SVM model">
@@ -294,9 +387,33 @@ int main(int argc, char** argv) {
     vector<float> descriptorVector;
     vector<unsigned int> descriptorVectorIndices;
     // Generate a single detecting feature vector (v1 | b) from the trained support vectors, for use e.g. with the HOG algorithm
-    SVMlight::getInstance()->getSingleDetectingVector(descriptorVector, descriptorVectorIndices);
+    TRAINHOG_SVM_TO_TRAIN::getInstance()->getSingleDetectingVector(descriptorVector, descriptorVectorIndices);
     // And save the precious to file system
     saveDescriptorVectorToFile(descriptorVector, descriptorVectorIndices, descriptorVectorFile);
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Test detecting vector">
+    // Detector detection tolerance threshold
+    const double hitThreshold = TRAINHOG_SVM_TO_TRAIN::getInstance()->getThreshold();
+    // Set our custom detecting vector
+    hog.setSVMDetector(descriptorVector);
+    
+    printf("Testing training phase using training set as test set (just to check if training is ok - no detection quality conclusion with this!)\n");
+    detectTrainingSetTest(hog, hitThreshold, positiveTrainingImages, negativeTrainingImages);
+    
+    printf("Testing custom detection using camera\n");
+    VideoCapture cap(0); // open the default camera
+    if(!cap.isOpened()) { // check if we succeeded
+        printf("Error opening camera!\n");
+        return EXIT_FAILURE;
+    }
+    Mat testImage;
+    while ((cvWaitKey(10) & 255) != 27) {
+        cap >> testImage; // get a new frame from camera
+//        cvtColor(testImage, testImage, CV_BGR2GRAY); // If you want to work on grayscale images
+        detectTest(hog, hitThreshold, testImage);
+        imshow("HOG custom detection", testImage);
+    }
     // </editor-fold>
 
     return EXIT_SUCCESS;

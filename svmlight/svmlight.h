@@ -1,6 +1,6 @@
 /** 
  * @file:   svmlight.h
- * @author: Jan Hendriks (dahoc3150 [at] yahoo.com)
+ * @author: Jan Hendriks (dahoc3150 [at] gmail.com)
  * @date:   Created on 11. Mai 2011
  * @brief:  Wrapper interface for SVMlight, 
  * @see http://www.cs.cornell.edu/people/tj/svm_light/ for SVMlight details and terms of use
@@ -100,7 +100,7 @@ public:
     }
 
     // read in a problem (in svmlight format)
-    void read_problem(char *filename) {
+    void read_problem(char* filename) {
         // Reads and parses the specified file
         read_documents(filename, &docs, &target, &totwords, &totdoc);
     }
@@ -111,18 +111,18 @@ public:
     }
 
     /**
-     * Generates a single detecting feature vector (v1 | b) from the trained support vectors, for use e.g. with the HOG algorithm
-     * vec1 = sum_1_n (alpha_y*x_i). (vec1 is a 1 x n column vector. n = feature vector length )
+     * Generates a single detecting feature vector (v1) from the trained support vectors, for use e.g. with the HOG algorithm
+     * vec1 = sum_1_n (alpha_y*x_i). (vec1 is a 1 x n column vector. n = feature vector length)
      * @param singleDetectorVector resulting single detector vector for use in openCV HOG
-     * @param singleDetectorVectorIndices
+     * @param singleDetectorVectorIndices dummy vector for this implementation
      */
     void getSingleDetectingVector(std::vector<float>& singleDetectorVector, std::vector<unsigned int>& singleDetectorVectorIndices) {
         // Now we use the trained svm to retrieve the single detector vector
         DOC** supveclist = model->supvec;
         printf("Calculating single descriptor vector out of support vectors (may take some time)\n");
-        // Retrieve single detecting vector (v1 | b) from returned ones by calculating vec1 = sum_1_n (alpha_y*x_i). (vec1 is a n x1 column vector. n = feature vector length )
+        // Retrieve single detecting vector (v1) from returned ones by calculating vec1 = sum_1_n (alpha_y*x_i). (vec1 is a n x1 column vector. n = feature vector length)
         singleDetectorVector.clear();
-        singleDetectorVector.resize(model->totwords + 1, 0.);
+        singleDetectorVector.resize(model->totwords, 0.);
         printf("Resulting vector size %lu\n", singleDetectorVector.size());
         
         // Walk over every support vector
@@ -134,12 +134,21 @@ public:
             // Walk through components of the support vector and populate our detector vector
             for (unsigned long singleFeature = 0; singleFeature < model->totwords; ++singleFeature) {
                 singleSupportVectorComponent = singleSupportVectorValues->words[singleFeature];
-                singleDetectorVector.at(singleSupportVectorComponent.wnum) += (singleSupportVectorComponent.weight * model->alpha[ssv]);
+                singleDetectorVector.at(singleSupportVectorComponent.wnum-1) += (singleSupportVectorComponent.weight * model->alpha[ssv]);
             }
         }
-
-        // This is a threshold value which is also recorded in the lear code in lib/windetect.cpp at line 1297 as linearbias and in the original paper as constant epsilon, but no comment on how it is generated
-        singleDetectorVector.at(model->totwords) = -model->b; /** @NOTE the minus sign! */
+    }
+    
+    /**
+     * Return model detection threshold / bias
+     * @return detection threshold / bias
+     */
+    double getThreshold() const {
+        return model->b;
+    }
+    
+    const char* getSVMName() const {
+        return "SVMlight";
     }
 
 };
@@ -149,5 +158,6 @@ SVMlight* SVMlight::getInstance() {
     static SVMlight theInstance;
     return &theInstance;
 }
+
 
 #endif	/* SVMLIGHT_H */
