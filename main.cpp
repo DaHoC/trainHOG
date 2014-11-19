@@ -38,7 +38,6 @@
 
 #define TRAINHOG_USEDSVM SVMLIGHT
 
-
 #include <stdio.h>
 #include <dirent.h>
 #include <ios>

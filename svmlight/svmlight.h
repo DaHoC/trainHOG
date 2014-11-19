@@ -159,5 +159,4 @@ SVMlight* SVMlight::getInstance() {
     return &theInstance;
 }
 
-
 #endif	/* SVMLIGHT_H */
