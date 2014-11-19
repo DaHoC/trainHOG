@@ -22,6 +22,7 @@ AS=as
 
 # Macros
 CND_PLATFORM=GNU-Linux-x86
+CND_DLIB_EXT=so
 CND_CONF=Release
 CND_DISTDIR=dist
 CND_BUILDDIR=build
@@ -34,10 +35,10 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/main.o \
-	${OBJECTDIR}/_ext/1444234597/svm_learn.o \
+	${OBJECTDIR}/_ext/1444234597/svm_common.o \
 	${OBJECTDIR}/_ext/1444234597/svm_hideo.o \
-	${OBJECTDIR}/_ext/1444234597/svm_common.o
+	${OBJECTDIR}/_ext/1444234597/svm_learn.o \
+	${OBJECTDIR}/main.o
 
 
 # C Compiler Flags
@@ -62,27 +63,27 @@ LDLIBSOPTIONS=-lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/opencvhogtrainer: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/opencvhogtrainer ${OBJECTFILES} ${LDLIBSOPTIONS} 
-
-${OBJECTDIR}/main.o: main.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -I/usr/local/include/opencv2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/main.o main.cpp
-
-${OBJECTDIR}/_ext/1444234597/svm_learn.o: /home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1444234597
-	${RM} $@.d
-	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1444234597/svm_learn.o /home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c
-
-${OBJECTDIR}/_ext/1444234597/svm_hideo.o: /home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1444234597
-	${RM} $@.d
-	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1444234597/svm_hideo.o /home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/opencvhogtrainer ${OBJECTFILES} ${LDLIBSOPTIONS}
 
 ${OBJECTDIR}/_ext/1444234597/svm_common.o: /home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1444234597
-	${RM} $@.d
-	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1444234597/svm_common.o /home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1444234597/svm_common.o /home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c
+
+${OBJECTDIR}/_ext/1444234597/svm_hideo.o: /home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1444234597
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1444234597/svm_hideo.o /home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c
+
+${OBJECTDIR}/_ext/1444234597/svm_learn.o: /home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1444234597
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1444234597/svm_learn.o /home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c
+
+${OBJECTDIR}/main.o: main.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -I/usr/local/include/opencv2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
 
 # Subprojects
 .build-subprojects:

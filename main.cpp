@@ -247,6 +247,9 @@ static void detectTrainingSetTest(const HOGDescriptor& hog, const double hitThre
         const Mat imageData = imread(*posTrainingIterator, 0);
         hog.detect(imageData, foundDetection, hitThreshold, winStride, trainingPadding);
 //        printf("Detections in pos training image '%s': %lu\n", posTrainingIterator->c_str(), foundDetection.size());
+        if (foundDetection.size() > 1) {
+            falseNegatives += foundDetection.size();
+        } else
         if (foundDetection.size() > 0) {
             ++truePositives;
         } else {
@@ -259,7 +262,7 @@ static void detectTrainingSetTest(const HOGDescriptor& hog, const double hitThre
         hog.detect(imageData, foundDetection, hitThreshold, winStride, trainingPadding);
 //        printf("Detections in neg training image '%s': %lu\n", negTrainingIterator->c_str(), foundDetection.size());
         if (foundDetection.size() > 0) {
-            ++falsePositives;
+            falsePositives += foundDetection.size();
         } else {
             ++trueNegatives;
         }        
