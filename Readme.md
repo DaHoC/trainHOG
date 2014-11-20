@@ -16,9 +16,11 @@ What this program basically does:
 * Read in and pass the features and their classes to a machine learning algorithm, e.g. SVMlight
 * Train the machine learning algorithm using the specified parameters
 * Use the calculated support vectors and SVM model to calculate a single detecting descriptor vector
+* Dry-run the newly trained custom HOG descriptor against training set and against camera images, if available
 
 ## Usage
 See the tutorial at https://github.com/DaHoC/trainHOG/wiki/trainHOG-Tutorial (previously http://opencv.willowgarage.com/wiki/trainHOG) for instructions on how to use.
+The steps in the preparations part are necessary for this program to be able to compile and run.
 
 Build by issuing:
 * g++ `pkg-config --cflags opencv` -c -g -MMD -MP -MF main.o.d -o main.o main.cpp

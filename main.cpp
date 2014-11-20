@@ -18,6 +18,7 @@
  * 4. Read in and pass the features and their classes to a machine learning algorithm, e.g. SVMlight
  * 5. Train the machine learning algorithm using the specified parameters
  * 6. Use the calculated support vectors and SVM model to calculate a single detecting descriptor vector
+ * 7. Dry-run the newly trained custom HOG descriptor against training set and against camera images, if available
  * 
  * Build by issuing:
  * g++ `pkg-config --cflags opencv` -c -g -MMD -MP -MF main.o.d -o main.o main.cpp
@@ -288,8 +289,8 @@ static void detectTest(const HOGDescriptor& hog, const double hitThreshold, Mat&
 
 /**
  * Main program entry point
- * @param argc
- * @param argv
+ * @param argc unused
+ * @param argv unused
  * @return EXIT_SUCCESS (0) or EXIT_FAILURE (1)
  */
 int main(int argc, char** argv) {
