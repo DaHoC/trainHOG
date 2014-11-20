@@ -3,3 +3,13 @@
 /pos/
 /pos_red/
 /neg_red/
+/svmlight/svm_common.c
+/svmlight/svm_hideo.c
+/svmlight/svmlight.h_bak
+/svmlight/svm_learn.h
+/svmlight/svm_learn.c
+/svmlight/svm_common.h
+/svmlight/kernel.h
+/libsvm/svm.h
+/libsvm/libsvm.h_bak
+/libsvm/svm.cpp
