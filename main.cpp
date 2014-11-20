@@ -36,7 +36,8 @@
  * For used third-party software, refer to their respective terms of use and licensing.
  */
 
-#define TRAINHOG_USEDSVM SVMLIGHT
+// <editor-fold defaultstate="collapsed" desc="Definitions">
+/* Parameter and macro definitions */
 
 #include <stdio.h>
 #include <dirent.h>
@@ -47,10 +48,16 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
 
+#define SVMLIGHT 1
+#define LIBSVM 2
+
+//#define TRAINHOG_USEDSVM SVMLIGHT
+#define TRAINHOG_USEDSVM SVMLIGHT
+
 #if TRAINHOG_USEDSVM == SVMLIGHT
     #include "svmlight/svmlight.h"
     #define TRAINHOG_SVM_TO_TRAIN SVMlight
-#else
+#elif TRAINHOG_USEDSVM == LIBSVM
     #include "libsvm/libsvm.h"
     #define TRAINHOG_SVM_TO_TRAIN libSVM
 #endif
@@ -58,8 +65,6 @@
 using namespace std;
 using namespace cv;
 
-// <editor-fold defaultstate="collapsed" desc="Parameter definitions">
-/* Parameter definitions */
 
 // Directory containing positive sample images
 static string posSamplesDir = "pos/";
@@ -245,12 +250,9 @@ static void detectTrainingSetTest(const HOGDescriptor& hog, const double hitThre
     for (vector<string>::const_iterator posTrainingIterator = posFileNames.begin(); posTrainingIterator != posFileNames.end(); ++posTrainingIterator) {
         const Mat imageData = imread(*posTrainingIterator, 0);
         hog.detect(imageData, foundDetection, hitThreshold, winStride, trainingPadding);
-//        printf("Detections in pos training image '%s': %lu\n", posTrainingIterator->c_str(), foundDetection.size());
-        if (foundDetection.size() > 1) {
-            falseNegatives += foundDetection.size();
-        } else
         if (foundDetection.size() > 0) {
             ++truePositives;
+            falseNegatives += foundDetection.size() - 1;
         } else {
             ++falseNegatives;
         }
@@ -259,7 +261,6 @@ static void detectTrainingSetTest(const HOGDescriptor& hog, const double hitThre
     for (vector<string>::const_iterator negTrainingIterator = negFileNames.begin(); negTrainingIterator != negFileNames.end(); ++negTrainingIterator) {
         const Mat imageData = imread(*negTrainingIterator, 0);
         hog.detect(imageData, foundDetection, hitThreshold, winStride, trainingPadding);
-//        printf("Detections in neg training image '%s': %lu\n", negTrainingIterator->c_str(), foundDetection.size());
         if (foundDetection.size() > 0) {
             falsePositives += foundDetection.size();
         } else {

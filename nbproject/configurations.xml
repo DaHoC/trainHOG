@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="80">
+<configurationDescriptor version="90">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>libsvm/libsvm.h</itemPath>
+      <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svmlight.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -14,6 +16,10 @@
                    projectFiles="true">
       <logicalFolder name="f2" displayName="genfiles" projectFiles="true">
       </logicalFolder>
+      <logicalFolder name="libsvm" displayName="libsvm" projectFiles="true">
+        <itemPath>libsvm/svm.cpp</itemPath>
+        <itemPath>libsvm/svm.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="svmlight" displayName="svmlight" projectFiles="true">
         <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/kernel.h</itemPath>
         <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c</itemPath>
@@ -21,7 +27,6 @@
         <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c</itemPath>
         <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c</itemPath>
         <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.h</itemPath>
-        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svmlight.h</itemPath>
       </logicalFolder>
       <itemPath>Readme.md</itemPath>
       <itemPath>main.cpp</itemPath>
@@ -40,13 +45,15 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>/home/dahoc/projects/openCVHogTrainer/svmlight</Elem>
+    <Elem>libsvm</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="1">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <ccTool>
@@ -60,11 +67,57 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/kernel.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svmlight.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Readme.md" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="libsvm/libsvm.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="libsvm/svm.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="libsvm/svm.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <cTool>
@@ -100,6 +153,51 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/kernel.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svmlight.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Readme.md" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="libsvm/libsvm.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="libsvm/svm.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="libsvm/svm.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
     </conf>
   </confs>
 </configurationDescriptor>

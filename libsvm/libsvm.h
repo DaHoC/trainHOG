@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 // Precision to use (float / double)
-typedef double prec;
+typedef float prec;
 
 // namespace required for avoiding collisions of declarations (e.g. LINEAR being declared in flann, svmlight and libsvm)
 namespace libsvm {
@@ -250,7 +250,7 @@ public:
      * Only makes sense after training was done
      * @param _modelFileName file name to save the model to
      */
-    void saveModelToFile(const std::string _modelFileName, const std::string _identifier = "libsvm") {
+    void saveModelToFile(const std::string _modelFileName) {
         if (svm_save_model(_modelFileName.c_str(), getInstance()->model)) {
             fprintf(stderr, "Error: Could not save model to file %s\n", _modelFileName.c_str());
             exit(EXIT_FAILURE);
@@ -260,9 +260,8 @@ public:
     /**
      * Function was unit tested, can be assumed libSVM model is correctly loaded from file
      * @param _modelFileName
-     * @param _identifier
      */
-    void loadModelFromFile(const std::string _modelFileName, const std::string _identifier = "libsvm") {
+    void loadModelFromFile(const std::string _modelFileName) {
         this->freeMem();
         /// @WARNING: This is really important, ROS seems to set the system locale which takes decimal commata instead of points which causes the file input parsing to fail
         // Do not use the system locale setlocale(LC_ALL, "C");
@@ -374,8 +373,10 @@ public:
     }
 
     /**
-     * Generates a single detecting feature vector (v1 | b) from the trained support vectors, for use e.g. with the HOG algorithm
+     * Generates a single detecting feature vector (vec1) from the trained support vectors, for use e.g. with the HOG algorithm
      * vec1 = sum_1_n (alpha_y*x_i). (vec1 is a 1 x n column vector. n = feature vector length )
+     * @param singleDetectorVector resulting single detector vector for use in openCV HOG
+     * @param singleDetectorVectorIndices vector containing indices of features inside singleDetectorVector
      */
     void getSingleDetectingVector(std::vector<prec>& singleDetectorVector, std::vector<unsigned int>& singleDetectorVectorIndices) {
         // Now we use the trained svm to retrieve the single detector vector
@@ -384,19 +385,16 @@ public:
         singleDetectorVectorIndices.clear();
         printf("Total number of support vectors: %d \n", model->l);
         //        printf("Number of SVs for each class: %d \n", _model->nr_class);
-        double b = -(model->rho[0]); // This is the b value from the SVM, assumes that first the positive labels are read in (otherwise, use double b = (*_model->rho); )
-        printf("b: %+3.5f\n", b);
         // Walk over every support vector and build a single vector
         for (unsigned long ssv = 0; ssv < model->l; ++ssv) { // Walks over available classes (e.g. +1, -1 representing positive and negative training samples)
-//                        printf("Support vector #%lu \n", ssv);
-            // Retrive the current support vector from the training set
+            // Retrieve the current support vector from the training set
             svm_node* singleSupportVector = model->SV[ssv]; // Get next support vector ssv==class, 2nd index is the component of the SV
             //            _prob->x[singleSupportVector->index];
             // sv_coef[i] = alpha[i]*sign(label[i]) = alpha[i] * y[i], where i is the training instance, y[i] in [+1,-1]
             double alpha = model->sv_coef[0][ssv];
             int singleVectorComponent = 0;
 //            while (singleSupportVector[singleVectorComponent].index != UINT_MAX) { // index=UINT_MAX indicates the end of the array
-            while (singleSupportVector[singleVectorComponent].index != -1) { // index=UINT_MAX indicates the end of the array
+            while (singleSupportVector[singleVectorComponent].index != -1) { // index=-1 indicates the end of the array
                 //    if (singleVectorComponent > 3777)
                 //        printf("\n-->%d", singleVectorComponent);
                 //                printf("Support Vector index: %u, %+3.5f \n", singleSupportVector[singleVectorComponent].index, singleSupportVector[singleVectorComponent].value);
@@ -414,11 +412,9 @@ public:
             }
         }
 
-        //        printf("Loop done\n");
-
         // This is a threshold value which is also recorded in the lear code in lib/windetect.cpp at line 1297 as linearbias and in the original paper as constant epsilon, but no comment on how it is generated
-        singleDetectorVector.push_back(b); // Add threshold
-        singleDetectorVectorIndices.push_back(-1); // Add maximum unsigned int as index indicating the end of the vector
+//        singleDetectorVector.push_back(b); // Add threshold
+//        singleDetectorVectorIndices.push_back(-1); // Add maximum unsigned int as index indicating the end of the vector
 //        singleDetectorVectorIndices->push_back(UINT_MAX); // Add maximum unsigned int as index indicating the end of the vector
     }
 

@@ -1,6 +1,6 @@
 # openCV HOG Trainer
 
-Example linux program on how to train your custom HOG detecting vector for use with openCV '''hog.setSVMDetector(_descriptor)'''
+Example linux program on how to train your custom HOG detecting vector for use with openCV hog.setSVMDetector(_descriptor)
 
 ## Information
 

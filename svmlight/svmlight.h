@@ -91,11 +91,11 @@ public:
 
     static SVMlight* getInstance();
 
-    inline void saveModelToFile(const std::string _modelFileName, const std::string _identifier = "svmlight") {
+    inline void saveModelToFile(const std::string _modelFileName) {
         write_model(const_cast<char*>(_modelFileName.c_str()), model);
     }
 
-    void loadModelFromFile(const std::string _modelFileName, const std::string _identifier = "svmlight") {
+    void loadModelFromFile(const std::string _modelFileName) {
         this->model = read_model(const_cast<char*>(_modelFileName.c_str()));
     }
 
@@ -111,7 +111,7 @@ public:
     }
 
     /**
-     * Generates a single detecting feature vector (v1) from the trained support vectors, for use e.g. with the HOG algorithm
+     * Generates a single detecting feature vector (vec1) from the trained support vectors, for use e.g. with the HOG algorithm
      * vec1 = sum_1_n (alpha_y*x_i). (vec1 is a 1 x n column vector. n = feature vector length)
      * @param singleDetectorVector resulting single detector vector for use in openCV HOG
      * @param singleDetectorVectorIndices dummy vector for this implementation
@@ -143,7 +143,7 @@ public:
      * Return model detection threshold / bias
      * @return detection threshold / bias
      */
-    double getThreshold() const {
+    float getThreshold() const {
         return model->b;
     }
     
