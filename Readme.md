@@ -18,7 +18,7 @@ What this program basically does:
 * Use the calculated support vectors and SVM model to calculate a single detecting descriptor vector
 
 ## Usage
-See the tutorial at http://opencv.willowgarage.com/wiki/trainHOG for instructions on how to use.
+See the tutorial at https://github.com/DaHoC/trainHOG/wiki/trainHOG-Tutorial (previously http://opencv.willowgarage.com/wiki/trainHOG) for instructions on how to use.
 
 Build by issuing:
 * g++ `pkg-config --cflags opencv` -c -g -MMD -MP -MF main.o.d -o main.o main.cpp
