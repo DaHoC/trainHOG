@@ -4,7 +4,11 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/kernel.h</itemPath>
       <itemPath>libsvm/libsvm.h</itemPath>
+      <itemPath>libsvm/svm.h</itemPath>
+      <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.h</itemPath>
+      <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.h</itemPath>
       <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svmlight.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -18,15 +22,11 @@
       </logicalFolder>
       <logicalFolder name="libsvm" displayName="libsvm" projectFiles="true">
         <itemPath>libsvm/svm.cpp</itemPath>
-        <itemPath>libsvm/svm.h</itemPath>
       </logicalFolder>
       <logicalFolder name="svmlight" displayName="svmlight" projectFiles="true">
-        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/kernel.h</itemPath>
         <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c</itemPath>
-        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.h</itemPath>
         <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c</itemPath>
         <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c</itemPath>
-        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.h</itemPath>
       </logicalFolder>
       <itemPath>Readme.md</itemPath>
       <itemPath>main.cpp</itemPath>
