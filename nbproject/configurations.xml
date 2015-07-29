@@ -28,6 +28,7 @@
         <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c</itemPath>
         <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c</itemPath>
       </logicalFolder>
+      <itemPath>ApacheLicense2.0</itemPath>
       <itemPath>Readme.md</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
@@ -101,6 +102,8 @@
             ex="false"
             tool="3"
             flavor2="0">
+      </item>
+      <item path="ApacheLicense2.0" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Readme.md" ex="false" tool="3" flavor2="0">
       </item>
@@ -187,6 +190,8 @@
             ex="false"
             tool="3"
             flavor2="0">
+      </item>
+      <item path="ApacheLicense2.0" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Readme.md" ex="false" tool="3" flavor2="0">
       </item>

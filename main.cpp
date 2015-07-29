@@ -5,6 +5,21 @@
  * @brief:  Example program on how to train your custom HOG detecting vector
  * for use with openCV <code>hog.setSVMDetector(_descriptor)</code>;
  * 
+ * Copyright 2015 Jan Hendriks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *  
  * For the paper regarding Histograms of Oriented Gradients (HOG), @see http://lear.inrialpes.fr/pubs/2005/DT05/
  * You can populate the positive samples dir with files from the INRIA person detection dataset, @see http://pascal.inrialpes.fr/data/human/
  * This program uses SVMlight as machine learning algorithm (@see http://svmlight.joachims.org/), but is not restricted to it
@@ -338,8 +353,10 @@ int main(int argc, char** argv) {
     fstream File;
     File.open(featuresFile.c_str(), ios::out);
     if (File.good() && File.is_open()) {
-		// Remove following line for libsvm which does not support comments
-        // File << "# Use this file to train, e.g. SVMlight by issuing $ svm_learn -i 1 -a weights.txt " << featuresFile.c_str() << endl;
+        #if TRAINHOG_USEDSVM == SVMLIGHT
+            // Remove following line for libsvm which does not support comments
+            File << "# Use this file to train, e.g. SVMlight by issuing $ svm_learn -i 1 -a weights.txt " << featuresFile.c_str() << endl;
+        #endif
         // Iterate over sample images
         for (unsigned long currentFile = 0; currentFile < overallSamples; ++currentFile) {
             storeCursor();
