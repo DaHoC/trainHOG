@@ -95,6 +95,8 @@ static string featuresFile = "genfiles/features.dat";
 static string svmModelFile = "genfiles/svmlightmodel.dat";
 // Set the file to write the resulting detecting descriptor vector to
 static string descriptorVectorFile = "genfiles/descriptorvector.dat";
+// Set the file to write the resulting opencv hog classifier as YAML file
+static string cvHOGFile = "genfiles/cvHOGClassifier.yaml";
 
 // HOG parameters for training that for some reason are not included in the HOG class
 static const Size trainingPadding = Size(0, 0);
@@ -431,7 +433,8 @@ int main(int argc, char** argv) {
     const double hitThreshold = TRAINHOG_SVM_TO_TRAIN::getInstance()->getThreshold();
     // Set our custom detecting vector
     hog.setSVMDetector(descriptorVector);
-    
+    hog.save(cvHOGFile);
+	
     printf("Testing training phase using training set as test set (just to check if training is ok - no detection quality conclusion with this!)\n");
     detectTrainingSetTest(hog, hitThreshold, positiveTrainingImages, negativeTrainingImages);
 
