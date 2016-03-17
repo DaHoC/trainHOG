@@ -57,6 +57,9 @@
 
 #include <stdio.h>
 #include <dirent.h>
+#ifdef __MINGW32__
+#include <sys/stat.h>
+#endif
 #include <ios>
 #include <fstream>
 #include <stdexcept>
@@ -157,15 +160,25 @@ static void saveDescriptorVectorToFile(vector<float>& descriptorVector, vector<u
  */
 static void getFilesInDirectory(const string& dirName, vector<string>& fileNames, const vector<string>& validExtensions) {
     printf("Opening directory %s\n", dirName.c_str());
+#ifdef __MINGW32__
+	struct stat s;
+#endif
     struct dirent* ep;
     size_t extensionLocation;
     DIR* dp = opendir(dirName.c_str());
     if (dp != NULL) {
         while ((ep = readdir(dp))) {
             // Ignore (sub-)directories like . , .. , .svn, etc.
+#ifdef __MINGW32__	
+			stat(ep->d_name, &s);
+			if (s.st_mode & S_IFDIR) {
+				continue;
+			}
+#else
             if (ep->d_type & DT_DIR) {
                 continue;
             }
+#endif
             extensionLocation = string(ep->d_name).find_last_of("."); // Assume the last point marks beginning of extension like file.ext
             // Check if extension is matching the wanted ones
             string tempExt = toLowerCase(string(ep->d_name).substr(extensionLocation + 1));
@@ -421,7 +434,8 @@ int main(int argc, char** argv) {
     
     printf("Testing training phase using training set as test set (just to check if training is ok - no detection quality conclusion with this!)\n");
     detectTrainingSetTest(hog, hitThreshold, positiveTrainingImages, negativeTrainingImages);
-    
+
+    /**    
     printf("Testing custom detection using camera\n");
     VideoCapture cap(0); // open the default camera
     if(!cap.isOpened()) { // check if we succeeded
@@ -435,6 +449,7 @@ int main(int argc, char** argv) {
         detectTest(hog, hitThreshold, testImage);
         imshow("HOG custom detection", testImage);
     }
+    */
     // </editor-fold>
 
     return EXIT_SUCCESS;
