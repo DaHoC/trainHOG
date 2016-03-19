@@ -10,8 +10,7 @@
             <sourceEncoding>UTF-8</sourceEncoding>
             <make-dep-projects/>
             <sourceRootList>
-                <sourceRootElem>/home/dahoc/projects/openCVHogTrainer/svmlight</sourceRootElem>
-                <sourceRootElem>libsvm</sourceRootElem>
+                <sourceRootElem>.</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

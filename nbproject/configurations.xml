@@ -4,16 +4,18 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/kernel.h</itemPath>
+      <itemPath>svmlight/kernel.h</itemPath>
       <itemPath>libsvm/libsvm.h</itemPath>
       <itemPath>libsvm/svm.h</itemPath>
-      <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.h</itemPath>
-      <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.h</itemPath>
-      <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svmlight.h</itemPath>
+      <itemPath>svmlight/svm_common.h</itemPath>
+      <itemPath>svmlight/svm_learn.h</itemPath>
+      <itemPath>svmlight/svmlight.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
                    projectFiles="true">
+      <itemPath>ApacheLicense2.txt</itemPath>
+      <itemPath>Readme.md</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -24,12 +26,10 @@
         <itemPath>libsvm/svm.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="svmlight" displayName="svmlight" projectFiles="true">
-        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c</itemPath>
-        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c</itemPath>
-        <itemPath>/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c</itemPath>
+        <itemPath>svmlight/svm_common.c</itemPath>
+        <itemPath>svmlight/svm_hideo.c</itemPath>
+        <itemPath>svmlight/svm_learn.c</itemPath>
       </logicalFolder>
-      <itemPath>ApacheLicense2.0</itemPath>
-      <itemPath>Readme.md</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -45,8 +45,7 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>/home/dahoc/projects/openCVHogTrainer/svmlight</Elem>
-    <Elem>libsvm</Elem>
+    <Elem>.</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -68,42 +67,7 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/kernel.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c"
-            ex="false"
-            tool="0"
-            flavor2="0">
-      </item>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c"
-            ex="false"
-            tool="0"
-            flavor2="0">
-      </item>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c"
-            ex="false"
-            tool="0"
-            flavor2="0">
-      </item>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svmlight.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="ApacheLicense2.0" ex="false" tool="3" flavor2="0">
+      <item path="ApacheLicense2.txt" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Readme.md" ex="false" tool="3" flavor2="0">
       </item>
@@ -114,6 +78,20 @@
       <item path="libsvm/svm.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="svmlight/kernel.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="svmlight/svm_common.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="svmlight/svm_common.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="svmlight/svm_hideo.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="svmlight/svm_learn.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="svmlight/svm_learn.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="svmlight/svmlight.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -156,42 +134,7 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/kernel.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c"
-            ex="false"
-            tool="0"
-            flavor2="0">
-      </item>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c"
-            ex="false"
-            tool="0"
-            flavor2="0">
-      </item>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c"
-            ex="false"
-            tool="0"
-            flavor2="0">
-      </item>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/dahoc/projects/openCVHogTrainer/svmlight/svmlight.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="ApacheLicense2.0" ex="false" tool="3" flavor2="0">
+      <item path="ApacheLicense2.txt" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Readme.md" ex="false" tool="3" flavor2="0">
       </item>
@@ -202,6 +145,20 @@
       <item path="libsvm/svm.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="svmlight/kernel.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="svmlight/svm_common.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="svmlight/svm_common.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="svmlight/svm_hideo.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="svmlight/svm_learn.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="svmlight/svm_learn.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="svmlight/svmlight.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>

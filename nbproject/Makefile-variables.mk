@@ -12,16 +12,16 @@ CND_ARTIFACT_DIR_Debug=
 CND_ARTIFACT_NAME_Debug=opencvhogtrainer
 CND_ARTIFACT_PATH_Debug=opencvhogtrainer
 CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux-x86/package
-CND_PACKAGE_NAME_Debug=opencvhogtrainer.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux-x86/package/opencvhogtrainer.tar
+CND_PACKAGE_NAME_Debug=trainhogpullrequests.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux-x86/package/trainhogpullrequests.tar
 # Release configuration
 CND_PLATFORM_Release=GNU-Linux-x86
 CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux-x86
-CND_ARTIFACT_NAME_Release=opencvhogtrainer
-CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux-x86/opencvhogtrainer
+CND_ARTIFACT_NAME_Release=trainhogpullrequests
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux-x86/trainhogpullrequests
 CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux-x86/package
-CND_PACKAGE_NAME_Release=opencvhogtrainer.tar
-CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux-x86/package/opencvhogtrainer.tar
+CND_PACKAGE_NAME_Release=trainhogpullrequests.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux-x86/package/trainhogpullrequests.tar
 #
 # include compiler specific variables
 #

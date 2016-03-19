@@ -35,11 +35,11 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/_ext/1444234597/svm_common.o \
-	${OBJECTDIR}/_ext/1444234597/svm_hideo.o \
-	${OBJECTDIR}/_ext/1444234597/svm_learn.o \
 	${OBJECTDIR}/libsvm/svm.o \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/main.o \
+	${OBJECTDIR}/svmlight/svm_common.o \
+	${OBJECTDIR}/svmlight/svm_hideo.o \
+	${OBJECTDIR}/svmlight/svm_learn.o
 
 
 # C Compiler Flags
@@ -65,21 +65,6 @@ LDLIBSOPTIONS=`pkg-config --libs opencv`
 opencvhogtrainer: ${OBJECTFILES}
 	${LINK.cc} -o opencvhogtrainer ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/_ext/1444234597/svm_common.o: /home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1444234597
-	${RM} "$@.d"
-	$(COMPILE.c) -g `pkg-config --cflags opencv`   -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1444234597/svm_common.o /home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c
-
-${OBJECTDIR}/_ext/1444234597/svm_hideo.o: /home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1444234597
-	${RM} "$@.d"
-	$(COMPILE.c) -g `pkg-config --cflags opencv`   -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1444234597/svm_hideo.o /home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c
-
-${OBJECTDIR}/_ext/1444234597/svm_learn.o: /home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1444234597
-	${RM} "$@.d"
-	$(COMPILE.c) -g `pkg-config --cflags opencv`   -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1444234597/svm_learn.o /home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c
-
 ${OBJECTDIR}/libsvm/svm.o: libsvm/svm.cpp 
 	${MKDIR} -p ${OBJECTDIR}/libsvm
 	${RM} "$@.d"
@@ -89,6 +74,21 @@ ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+
+${OBJECTDIR}/svmlight/svm_common.o: svmlight/svm_common.c 
+	${MKDIR} -p ${OBJECTDIR}/svmlight
+	${RM} "$@.d"
+	$(COMPILE.c) -g `pkg-config --cflags opencv`   -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/svmlight/svm_common.o svmlight/svm_common.c
+
+${OBJECTDIR}/svmlight/svm_hideo.o: svmlight/svm_hideo.c 
+	${MKDIR} -p ${OBJECTDIR}/svmlight
+	${RM} "$@.d"
+	$(COMPILE.c) -g `pkg-config --cflags opencv`   -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/svmlight/svm_hideo.o svmlight/svm_hideo.c
+
+${OBJECTDIR}/svmlight/svm_learn.o: svmlight/svm_learn.c 
+	${MKDIR} -p ${OBJECTDIR}/svmlight
+	${RM} "$@.d"
+	$(COMPILE.c) -g `pkg-config --cflags opencv`   -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/svmlight/svm_learn.o svmlight/svm_learn.c
 
 # Subprojects
 .build-subprojects:

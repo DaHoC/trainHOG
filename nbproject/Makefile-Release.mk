@@ -35,11 +35,11 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/_ext/1444234597/svm_common.o \
-	${OBJECTDIR}/_ext/1444234597/svm_hideo.o \
-	${OBJECTDIR}/_ext/1444234597/svm_learn.o \
 	${OBJECTDIR}/libsvm/svm.o \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/main.o \
+	${OBJECTDIR}/svmlight/svm_common.o \
+	${OBJECTDIR}/svmlight/svm_hideo.o \
+	${OBJECTDIR}/svmlight/svm_learn.o
 
 
 # C Compiler Flags
@@ -60,26 +60,11 @@ LDLIBSOPTIONS=-lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/opencvhogtrainer
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/trainhogpullrequests
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/opencvhogtrainer: ${OBJECTFILES}
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/trainhogpullrequests: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/opencvhogtrainer ${OBJECTFILES} ${LDLIBSOPTIONS}
-
-${OBJECTDIR}/_ext/1444234597/svm_common.o: /home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1444234597
-	${RM} "$@.d"
-	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1444234597/svm_common.o /home/dahoc/projects/openCVHogTrainer/svmlight/svm_common.c
-
-${OBJECTDIR}/_ext/1444234597/svm_hideo.o: /home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1444234597
-	${RM} "$@.d"
-	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1444234597/svm_hideo.o /home/dahoc/projects/openCVHogTrainer/svmlight/svm_hideo.c
-
-${OBJECTDIR}/_ext/1444234597/svm_learn.o: /home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1444234597
-	${RM} "$@.d"
-	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1444234597/svm_learn.o /home/dahoc/projects/openCVHogTrainer/svmlight/svm_learn.c
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/trainhogpullrequests ${OBJECTFILES} ${LDLIBSOPTIONS}
 
 ${OBJECTDIR}/libsvm/svm.o: libsvm/svm.cpp 
 	${MKDIR} -p ${OBJECTDIR}/libsvm
@@ -91,13 +76,28 @@ ${OBJECTDIR}/main.o: main.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -I/usr/local/include/opencv2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
 
+${OBJECTDIR}/svmlight/svm_common.o: svmlight/svm_common.c 
+	${MKDIR} -p ${OBJECTDIR}/svmlight
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/svmlight/svm_common.o svmlight/svm_common.c
+
+${OBJECTDIR}/svmlight/svm_hideo.o: svmlight/svm_hideo.c 
+	${MKDIR} -p ${OBJECTDIR}/svmlight
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/svmlight/svm_hideo.o svmlight/svm_hideo.c
+
+${OBJECTDIR}/svmlight/svm_learn.o: svmlight/svm_learn.c 
+	${MKDIR} -p ${OBJECTDIR}/svmlight
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/svmlight/svm_learn.o svmlight/svm_learn.c
+
 # Subprojects
 .build-subprojects:
 
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/opencvhogtrainer
+	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/trainhogpullrequests
 
 # Subprojects
 .clean-subprojects:

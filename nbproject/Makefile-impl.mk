@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=openCVHogTrainer
+PROJECTNAME=trainHogPullRequests
 
 # Active Configuration
 DEFAULTCONF=Debug
