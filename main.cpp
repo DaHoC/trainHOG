@@ -438,9 +438,8 @@ int main(int argc, char** argv) {
     printf("Testing training phase using training set as test set (just to check if training is ok - no detection quality conclusion with this!)\n");
     detectTrainingSetTest(hog, hitThreshold, positiveTrainingImages, negativeTrainingImages);
 
-    /**    
     printf("Testing custom detection using camera\n");
-    VideoCapture cap(0); // open the default camera
+    VideoCapture cap(-1); // open the default camera
     if(!cap.isOpened()) { // check if we succeeded
         printf("Error opening camera!\n");
         return EXIT_FAILURE;
@@ -452,7 +451,6 @@ int main(int argc, char** argv) {
         detectTest(hog, hitThreshold, testImage);
         imshow("HOG custom detection", testImage);
     }
-    */
     // </editor-fold>
 
     return EXIT_SUCCESS;
