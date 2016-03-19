@@ -41,7 +41,7 @@ private:
         kernel_parm = new KERNEL_PARM;
         // Init parameters
         verbosity = 1; // Show some messages -v 1
-        learn_parm->alphafile[0] = ' '; // NULL; // Important, otherwise files with strange/invalid names appear in the working directory
+        learn_parm->alphafile[0] = '\0'; // NULL; // Important, otherwise files with strange/invalid names appear in the working directory
         //        learn_parm->alphafile = NULL; // Important, otherwise files with strange/invalid names appear in the working directory
         learn_parm->biased_hyperplane = 1;
         learn_parm->sharedslack = 0; // 1
