@@ -4,7 +4,7 @@
  * @date:   Created on 6. Mai 2011, 15:00
  * @brief:  Wrapper interface for libSVM, 
  * @see http://www.csie.ntu.edu.tw/~cjlin/libsvm/ for libSVM details and terms of use
- * 
+ *
  */
 
 #ifndef LIBSVM_H
@@ -23,7 +23,7 @@ typedef float prec;
 
 // namespace required for avoiding collisions of declarations (e.g. LINEAR being declared in flann, svmlight and libsvm)
 namespace libsvm {
-    #include "svm.h"
+#include "svm.h"
 }
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
@@ -50,22 +50,7 @@ private:
         exit(1);
     }
 
-    char* readline(FILE *input) {
-        int len;
-
-        if (fgets(line, max_line_len, input) == NULL)
-            return NULL;
-
-        while (strrchr(line, '\n') == NULL) {
-            max_line_len *= 2;
-            line = (char *) realloc(line, max_line_len);
-            len = (int) strlen(line);
-            if (fgets(line + len, max_line_len - len, input) == NULL)
-                break;
-        }
-//        printf("%s\n", line);
-        return line;
-    }
+    char* readline(FILE *input);
 
     libSVM() : trainingDataStructsUsed(false), predictionDataStructsUsed(false) {
         line = NULL;
@@ -88,10 +73,9 @@ private:
         param.svm_type = EPSILON_SVR; // C_SVC; // EPSILON_SVR; // may be also NU_SVR; // do regression task
         param.weight_label = NULL; // for C_SVC
         param.weight = NULL; // for C_SVC
-//        x = Malloc(svm_node, 1);
-//        x = NULL;
-//        x_space = NULL;
         model = NULL;
+        max_line_len = 1024;
+        x_space = NULL;
     }
 
     /**
@@ -114,7 +98,7 @@ public:
     const char* getSVMName() const {
         return "libSVM";
     }
-
+    
     void freeMem() {
         // Try to avoid a double-free being thrown because the objects may not be allocated, because the functions that allocate them are not being called
         if (this->trainingDataStructsUsed) {
@@ -203,14 +187,7 @@ public:
                     exit_input_error(i + 1);                    
                 } else {
                     inst_max_index = x_space[j].index;
-//                    printf("Index %i ok\n", inst_max_index);
                 }
-
-//                printf("Raw val: '%s'\n", val);
-                // Use the following to convert . to , if some weird locale setting is set - see above for locale setting
-//                char* pos = strchr(val, '.');
-//                if (pos != NULL && pos[0] != '\0' && pos[0] != '\n') pos[0] = ',';
-                
                 errno = 0;
                 x_space[j].value = std::strtod(val, &endptr);
 //                printf("Value: '%f'\n", x_space[j].value);
@@ -300,65 +277,10 @@ public:
         return this->prob;
     }
 
-    /**
-     * Converts a vector of floats into an array of structs used by libsvm
-     * @WARNING: Implicitly this changes the memory size because it casts from float to double
-     * @WARNING: Untested as of now
-     * @TODO This conversion is slow when called in every detection step, how to avoid?
-     * May be it's faster using something like memcpy( destination, &myVector[0], sizeof( int ) * myVector.size() );
-     * @param _sample
-     * @param y
-     */
-/*
-    inline svm_node* convertFromVectorToSVMNodeArray(std::vector<float>* _sample) {
-        int max_nr_attrlocal = (_sample->size() + 1); // +1 because of the last index
-//        svm_node* y = (svm_node *) realloc(y, max_nr_attrlocal * sizeof (svm_node));
-//        y = (svm_node*) malloc (max_nr_attrlocal * sizeof (struct svm_node));
-        svm_node* y = (svm_node*) calloc (max_nr_attrlocal, sizeof (svm_node));
-        
-        for (unsigned int component = 0; component < _sample->size(); ++component) {
-            // Populate struct with vector values
-            y[component].index = component;
-            y[component].value = (double)_sample->at(component);
-        }
-        y[_sample->size()].index = -1; // UINT_MAX; // -1; // Indicate the end of the array for libsvm
-        y[_sample->size()].value = 0.; // Be polite, do not leave some arbitrary memory chunk in here
-        return y;
-    }
-*/
-    /**
-     * Predicts a label/class from specified _sample and given model
-     * @param _sample input sample to be classified
-     * @return label of class the SVM predicted for given sample
-     */
-/*
-    float predictLabel(std::vector<float>* _sample, double* prob_estimates) {
-        if (model == NULL) { /// @WARNING This is unelegant, valgrind complains because of check against uninitialized variable
-            printf("Error: A model must first be loaded or trained!\n");
-            exit(EXIT_FAILURE);
-        }
-        /// @TODO This conversion has to be avoided because we need speed in the detection step
-        struct svm_node* x = this->convertFromVectorToSVMNodeArray(_sample);
-//        printf("SVM type: %u, # classes: %u\n", svm_get_svm_type(model), svm_get_nr_class(model));
-//        this->predictLabel(x);
-//        float predict_label = svm_predict(model, x);
-        float predict_label = svm_predict_probability(model, x, prob_estimates);
-//        printf("Vorhergesagtes label: %+1.2f, Probability estimate: %+1.2f\n", predict_label, *prob_estimates);
-        free(x);
-        this->predictionDataStructsUsed = true;
-        return predict_label;
-    }
-*/
-
     float predictLabel(svm_node* _sample, double* _probEstimate) {
-        
-//        double* prob_estimates;
-//printf("Predict function before pred 2nd svm_node value: %3.6f\n", _sample[1].value);
         float predict_label = svm_predict_probability(model, _sample, _probEstimate);
 //printf("Predict function after pred 2nd svm_node value: %3.6f\n", _sample[1].value);
-//        printf("Vorhergesagtes label: %+1.2f\n", predict_label);
 //        printf("Probability estimates: %+1.2f, %1.2f\n", _probEstimate[0], _probEstimate[1]);
-//        printf("Model kernel type %d\n", model->param.kernel_type);
         return predict_label;
 //        return svm_predict(model, _sample);
     }
@@ -368,7 +290,6 @@ public:
      */
     void train() {
         model = svm_train(&prob, &param);
-//        model = svm_train(&prob, &param);
         trainingDataStructsUsed = true;
     }
 
@@ -384,23 +305,16 @@ public:
         singleDetectorVector.clear();
         singleDetectorVectorIndices.clear();
         printf("Total number of support vectors: %d \n", model->l);
-        //        printf("Number of SVs for each class: %d \n", _model->nr_class);
         // Walk over every support vector and build a single vector
         for (unsigned long ssv = 0; ssv < model->l; ++ssv) { // Walks over available classes (e.g. +1, -1 representing positive and negative training samples)
             // Retrieve the current support vector from the training set
             svm_node* singleSupportVector = model->SV[ssv]; // Get next support vector ssv==class, 2nd index is the component of the SV
-            //            _prob->x[singleSupportVector->index];
             // sv_coef[i] = alpha[i]*sign(label[i]) = alpha[i] * y[i], where i is the training instance, y[i] in [+1,-1]
             double alpha = model->sv_coef[0][ssv];
             int singleVectorComponent = 0;
-//            while (singleSupportVector[singleVectorComponent].index != UINT_MAX) { // index=UINT_MAX indicates the end of the array
             while (singleSupportVector[singleVectorComponent].index != -1) { // index=-1 indicates the end of the array
-                //    if (singleVectorComponent > 3777)
-                //        printf("\n-->%d", singleVectorComponent);
-                //                printf("Support Vector index: %u, %+3.5f \n", singleSupportVector[singleVectorComponent].index, singleSupportVector[singleVectorComponent].value);
                 if (ssv == 0) { // During first loop run determine the length of the support vectors and adjust the required vector size
                     singleDetectorVector.push_back(singleSupportVector[singleVectorComponent].value * alpha);
-                    //                    printf("-%d", singleVectorComponent);
                     singleDetectorVectorIndices.push_back(singleSupportVector[singleVectorComponent].index); // Holds the indices for the corresponding values in singleDetectorVector, mapping from singleVectorComponent to singleSupportVector[singleVectorComponent].index!
                 } else {
                     if (singleVectorComponent > singleDetectorVector.size()) { // Catch oversized vectors (maybe from differently sized images?)

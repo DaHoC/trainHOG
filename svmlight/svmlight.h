@@ -42,7 +42,6 @@ private:
         // Init parameters
         verbosity = 1; // Show some messages -v 1
         learn_parm->alphafile[0] = '\0'; // NULL; // Important, otherwise files with strange/invalid names appear in the working directory
-        //        learn_parm->alphafile = NULL; // Important, otherwise files with strange/invalid names appear in the working directory
         learn_parm->biased_hyperplane = 1;
         learn_parm->sharedslack = 0; // 1
         learn_parm->skip_final_opt_check = 0;
@@ -70,6 +69,11 @@ private:
         kernel_parm->coef_const = 1;
         kernel_parm->kernel_type = LINEAR; // -t 0
         kernel_parm->poly_degree = 3;
+        docs = NULL;
+        target = NULL;
+        totwords = 0;
+        i = 0;
+        totdoc = 0;
     }
 
     virtual ~SVMlight() {
@@ -138,7 +142,7 @@ public:
             }
         }
     }
-    
+
     /**
      * Return model detection threshold / bias
      * @return detection threshold / bias
@@ -146,7 +150,7 @@ public:
     float getThreshold() const {
         return model->b;
     }
-    
+
     const char* getSVMName() const {
         return "SVMlight";
     }

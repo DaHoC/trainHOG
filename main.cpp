@@ -212,7 +212,7 @@ static void calculateFeaturesFromInput(const string& imageFilename, vector<float
      * you either do not have a current openCV version (>2.0) 
      * or the linking order is incorrect, try g++ -o openCVHogTrainer main.cpp `pkg-config --cflags --libs opencv`
      */
-    Mat imageData = imread(imageFilename, 0);
+    Mat imageData = imread(imageFilename, IMREAD_GRAYSCALE);
     if (imageData.empty()) {
         featureVector.clear();
         printf("Error: HOG image '%s' is empty, features calculation skipped!\n", imageFilename.c_str());
@@ -279,7 +279,7 @@ static void detectTrainingSetTest(const HOGDescriptor& hog, const double hitThre
     vector<Point> foundDetection;
     // Walk over positive training samples, generate images and detect
     for (vector<string>::const_iterator posTrainingIterator = posFileNames.begin(); posTrainingIterator != posFileNames.end(); ++posTrainingIterator) {
-        const Mat imageData = imread(*posTrainingIterator, 0);
+        const Mat imageData = imread(*posTrainingIterator, IMREAD_GRAYSCALE);
         hog.detect(imageData, foundDetection, hitThreshold, winStride, trainingPadding);
         if (foundDetection.size() > 0) {
             ++truePositives;
@@ -290,7 +290,7 @@ static void detectTrainingSetTest(const HOGDescriptor& hog, const double hitThre
     }
     // Walk over negative training samples, generate images and detect
     for (vector<string>::const_iterator negTrainingIterator = negFileNames.begin(); negTrainingIterator != negFileNames.end(); ++negTrainingIterator) {
-        const Mat imageData = imread(*negTrainingIterator, 0);
+        const Mat imageData = imread(*negTrainingIterator, IMREAD_GRAYSCALE);
         hog.detect(imageData, foundDetection, hitThreshold, winStride, trainingPadding);
         if (foundDetection.size() > 0) {
             falsePositives += foundDetection.size();
@@ -447,7 +447,7 @@ int main(int argc, char** argv) {
     Mat testImage;
     while ((cvWaitKey(10) & 255) != 27) {
         cap >> testImage; // get a new frame from camera
-//        cvtColor(testImage, testImage, CV_BGR2GRAY); // If you want to work on grayscale images
+        cvtColor(testImage, testImage, CV_BGR2GRAY); // Work on grayscale images as trained
         detectTest(hog, hitThreshold, testImage);
         imshow("HOG custom detection", testImage);
     }
