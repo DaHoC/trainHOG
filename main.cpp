@@ -310,7 +310,7 @@ static void detectTrainingSetTest(const HOGDescriptor& hog, const double hitThre
  */
 static void detectTest(const HOGDescriptor& hog, const double hitThreshold, Mat& imageData) {
     vector<Rect> found;
-    Size padding(Size(32, 32));
+    Size padding(Size(8, 8));
     Size winStride(Size(8, 8));
     hog.detectMultiScale(imageData, found, hitThreshold, winStride, padding);
     showDetections(found, imageData);
